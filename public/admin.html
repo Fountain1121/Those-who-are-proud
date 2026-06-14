@@ -3,31 +3,67 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Exam Admin</title>
+    <title>Exam Admin Dashboard</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
+
   <body>
+    <!-- ADMIN TOPBAR -->
     <header class="topbar">
       <div>
         <p class="eyebrow">Pastoral School Examination</p>
-        <h1>Submission Admin</h1>
+        <h1>Submission Admin Dashboard</h1>
       </div>
-      <a class="admin-link" href="/">Exam</a>
+
+      <div class="admin-actions">
+        <a class="admin-link" href="/">← Back to Exam</a>
+      </div>
     </header>
+
+    <!-- ADMIN MAIN -->
     <main class="admin-main">
-      <section class="panel">
-        <h2>View Submissions</h2>
+
+      <!-- CONTROL PANEL -->
+      <section class="panel admin-panel">
+        <h2>Manage Submissions</h2>
+        <p class="subtext">
+          Enter your admin PIN to load and manage student submissions.
+        </p>
+
         <div class="admin-controls">
-          <label>
+
+          <!-- PIN INPUT -->
+          <label class="admin-field">
             Admin PIN
-            <input id="pin" type="password" />
+            <input id="pin" type="password" placeholder="Enter secure PIN" />
           </label>
-          <button id="loadSubmissions" class="primary" type="button">Load</button>
-          <button id="downloadCsv" class="secondary" type="button">Download CSV</button>
+
+          <!-- ACTION BUTTONS -->
+          <div class="admin-buttons">
+            <button id="loadSubmissions" class="primary" type="button">
+              Load Submissions
+            </button>
+
+            <button id="downloadCsv" class="secondary" type="button">
+              Download CSV
+            </button>
+          </div>
+
         </div>
       </section>
-      <section id="submissions" class="submissions"></section>
+
+      <!-- STATUS / LOADING AREA -->
+      <section id="adminStatus" class="admin-status" aria-live="polite"></section>
+
+      <!-- SUBMISSIONS OUTPUT -->
+      <section id="submissions" class="submissions">
+        <div class="empty-state">
+          <p>No submissions loaded yet.</p>
+        </div>
+      </section>
+
     </main>
+
     <script src="/admin.js"></script>
   </body>
 </html>

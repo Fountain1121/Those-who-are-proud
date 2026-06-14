@@ -299,7 +299,9 @@ const exam = {
   ]
 };
 
-let startedAt = null;
+let startedAt = localStorage.getItem(TIMER_KEY)
+  ? Number(localStorage.getItem(TIMER_KEY))
+  : null;
 let timerHandle = null;
 const DRAFT_KEY = "pastoralSchoolThoseWhoAreProudDraft.v1";
 let isRestoringDraft = false;
@@ -314,6 +316,8 @@ const blankList = document.querySelector("#blankList");
 const essayList = document.querySelector("#essayList");
 const form = document.querySelector("#examForm");
 const statusMessage = document.querySelector("#statusMessage");
+const SUBMISSION_LOCK_KEY = "exam_submitted_lock_v1";
+const TIMER_KEY = "exam_startedAt_v1";
 
 document.querySelector('input[name="date"]').valueAsDate = new Date();
 
@@ -567,9 +571,7 @@ function validateExamSections(payload) {
   if (Object.values(payload.answers).some((answer) => !answer)) {
     return "Please answer all 20 multiple-choice questions in Section A.";
   }
-  if (Object.values(payload.fillBlanks).flat().some((answer) => !answer)) {
-    return "Please complete all 20 blank spaces in Section B.";
-  }
+// blanks are optional now (no validation)
   return validateEssays(payload);
 }
 
@@ -589,11 +591,27 @@ loginForm.addEventListener("submit", (event) => {
   loginView.hidden = true;
   examView.hidden = false;
   startedAt = startedAt || Date.now();
+  localStorage.setItem(TIMER_KEY, startedAt);
   tickTimer();
   if (timerHandle) clearInterval(timerHandle);
   timerHandle = setInterval(tickTimer, 1000);
-  saveDraft();
+  saveDraft(
+    if (localStorage.getItem(SUBMISSION_LOCK_KEY + loginIndexNumber.value.trim())) return;
+  );
   form.elements.fullName.focus();
+  if (localStorage.getItem(SUBMISSION_LOCK_KEY + studentId)) {
+  statusMessage.textContent = "You have already submitted this exam.";
+  return;
+}
+});
+
+document.querySelectorAll(".nextBtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const order = ["sectionA", "sectionB", "sectionC", "review"];
+    const current = document.querySelector(".section.active")?.id;
+    const next = order[order.indexOf(current) + 1];
+    if (next) setActiveSection(next);
+  });
 });
 
 document.querySelector("#printBtn").addEventListener("click", () => window.print());
@@ -623,6 +641,15 @@ form.addEventListener("submit", async (event) => {
     statusMessage.classList.add("error");
     return;
   }
+  
+  const studentId = form.elements.indexNumber.value;
+
+localStorage.setItem(SUBMISSION_LOCK_KEY + studentId, "true");
+localStorage.removeItem(DRAFT_KEY);
+localStorage.removeItem(TIMER_KEY);
+clearInterval(timerHandle);
+
+isSubmitted = true;
 
   const submitButton = form.querySelector('button[type="submit"]');
   submitButton.disabled = true;

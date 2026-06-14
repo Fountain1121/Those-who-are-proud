@@ -634,3 +634,41 @@ pre {
     break-inside: avoid;
   }
 }
+
+/* =========================
+   LOGIN BOX (ADMIN LOGIN FIX)
+========================= */
+
+.login-box {
+  width: min(420px, 92%);
+  margin: 10vh auto;
+  padding: 28px;
+  border-radius: 10px;
+  border: 1px solid rgba(219, 227, 239, 0.9);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.login-box h2 {
+  margin-bottom: 16px;
+}
+
+.login-box input {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 11px 12px;
+  border-radius: 6px;
+  border: 1px solid #c8d3e3;
+  outline: none;
+}
+
+.login-box input:focus {
+  border-color: var(--focus);
+  outline: 4px solid color-mix(in srgb, var(--focus) 18%, transparent);
+}
+
+#msg {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: var(--warn);
+}
