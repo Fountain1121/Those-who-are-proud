@@ -24,9 +24,18 @@ function readSubmissions() {
   return content.split(/\r?\n/).filter(Boolean).map(line => JSON.parse(line));
 }
 
+// Improved isAdmin - accepts token from header OR query string
 function isAdmin(req) {
+  // Check Authorization header first
+  let token = "";
   const auth = req.headers.authorization || "";
-  const token = auth.replace("Bearer ", "").trim();
+  token = auth.replace("Bearer ", "").trim();
+
+  // If no header, check query parameter (used by download links)
+  if (!token && req.query.token) {
+    token = req.query.token.trim();
+  }
+
   return token === ADMIN_TOKEN;
 }
 
