@@ -1,73 +1,79 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Login</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Login — Pastoral School</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <section class="login-view">
+      <div class="login-bg-grid" aria-hidden="true"></div>
+      <div class="login-card">
+        <p class="brand-mark">Pastoral School</p>
+        <h1>Admin Access</h1>
+        <p class="login-copy">Sign in to manage submissions and exam records.</p>
 
-<body>
+        <form id="adminLoginForm" class="login-form">
+          <label>
+            Username
+            <input id="username" autocomplete="username" required placeholder="admin" />
+          </label>
+          <label>
+            Password
+            <input id="password" type="password" autocomplete="current-password" required placeholder="••••••••" />
+          </label>
+          <button id="loginBtn" class="primary wide" type="submit">Sign In</button>
+        </form>
 
-  <div class="login-box">
-    <h2>Admin Login</h2>
+        <p id="msg" class="status"></p>
 
-    <!-- FORM FIX: enables Enter key submit -->
-    <form id="adminLoginForm">
-      <input id="username" placeholder="Username" autocomplete="username" required />
-      <input id="password" type="password" placeholder="Password" autocomplete="current-password" required />
+        <div class="login-meta">
+          <span>Exam Portal</span>
+          <span>Admin Panel</span>
+          <span>Restricted</span>
+        </div>
 
-      <button id="loginBtn" type="submit">Login</button>
-    </form>
+        <p class="login-note"><a href="/" class="subtle-link">← Back to exam</a></p>
+      </div>
+    </section>
 
-    <p id="msg" class="status"></p>
-  </div>
+    <script>
+      const form = document.getElementById("adminLoginForm");
+      const msg  = document.getElementById("msg");
+      const btn  = document.getElementById("loginBtn");
 
-  <script>
-    const form = document.getElementById("adminLoginForm");
-    const msg = document.getElementById("msg");
-    const btn = document.getElementById("loginBtn");
-
-    async function login(event) {
-      event.preventDefault();
-
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-
-      if (!username || !password) {
-        msg.innerText = "Please enter both username and password.";
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = "Logging in...";
-      msg.innerText = "";
-
-      try {
-        const res = await fetch("/api/admin/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password })
-        });
-
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok) {
-          throw new Error(data.error || "Invalid login");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value.trim();
+        if (!username || !password) {
+          msg.textContent = "Please enter both username and password.";
+          msg.classList.add("error");
+          return;
         }
+        btn.disabled = true;
+        btn.textContent = "Signing in…";
+        msg.textContent = "";
+        msg.classList.remove("error");
 
-        msg.innerText = "Login successful. Redirecting...";
-        window.location.href = "/admin.html";
-
-      } catch (error) {
-        msg.innerText = error.message;
-        btn.disabled = false;
-        btn.innerText = "Login";
-      }
-    }
-
-    form.addEventListener("submit", login);
-  </script>
-
-</body>
+        try {
+          const res  = await fetch("/api/admin/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || "Invalid credentials.");
+          msg.textContent = "Login successful. Redirecting…";
+          window.location.href = "/admin.html";
+        } catch (error) {
+          msg.textContent = error.message;
+          msg.classList.add("error");
+          btn.disabled = false;
+          btn.textContent = "Sign In";
+        }
+      });
+    </script>
+  </body>
 </html>
