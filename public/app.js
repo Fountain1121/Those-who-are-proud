@@ -80,8 +80,6 @@ const exam = {
   ]
 };
 
-// ─── State ────────────────────────────────────────────────────────────────────
-// State
 let startedAt = null;
 let timerHandle = null;
 const DRAFT_KEY = "pastoralSchoolThoseWhoAreProudDraft.v2";
@@ -96,16 +94,26 @@ if (currentPath.includes("index.html") || currentPath === "/" || currentPath ===
 
   loginForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const studentId = loginIndexNum.value.trim();
+    const studentId = loginIndexNum.value.trim().toUpperCase();
     if (!studentId) return;
 
     const btn = loginForm.querySelector("button");
     btn.disabled = true;
     btn.textContent = "Checking...";
 
+    localStorage.removeItem(DRAFT_KEY);
+
     try {
       const res = await fetch(`/api/check-submitted?indexNumber=${encodeURIComponent(studentId)}`);
       const data = await res.json();
+
+      if (data.error) {
+        alert(data.error);
+        btn.disabled = false;
+        btn.textContent = "Continue to Exam";
+        return;
+      }
+
       if (data.submitted) {
         window.location.href = `/submitted.html?confirmationId=${encodeURIComponent(data.confirmationId || "N/A")}`;
         return;
@@ -127,12 +135,13 @@ if (currentPath.includes("exam.html")) {
   const blankList = document.getElementById("blankList");
   const essayList = document.getElementById("essayList");
 
-  // Set student ID
-  const savedId = localStorage.getItem("currentStudentId");
-  if (savedId) {
-    const idxInput = form.querySelector('input[name="indexNumber"]');
-    if (idxInput) idxInput.value = savedId;
+  const currentStudentId = localStorage.getItem("currentStudentId");
+  if (!currentStudentId) {
+    window.location.href = "/";
   }
+
+  const indexInput = form.querySelector('input[name="indexNumber"]');
+  if (indexInput) indexInput.value = currentStudentId;
 
   document.querySelector('input[name="date"]').valueAsDate = new Date();
 
@@ -141,7 +150,7 @@ if (currentPath.includes("exam.html")) {
   function renderMcq() {
     mcqList.innerHTML = exam.mcq.map((q, i) => `
       <fieldset class="question-card">
-        <legend>${i+1}. ${q.text}</legend>
+        <legend>${i + 1}. ${q.text}</legend>
         ${q.options.map((opt, oi) => `
           <label class="option">
             <input type="radio" name="${q.id}" value="${optionLetter(oi)}" />
@@ -153,11 +162,11 @@ if (currentPath.includes("exam.html")) {
   function renderBlanks() {
     blankList.innerHTML = exam.blanks.map((q, i) => `
       <div class="question-card">
-        <p class="question-title">${i+1}. ${q.text}</p>
+        <p class="question-title">${i + 1}. ${q.text}</p>
         <div class="blank-inputs">
-          ${Array.from({length: q.blanks}, (_, bi) => {
-            const label = q.blanks === 1 ? "Answer" : `Blank ${bi+1}`;
-            return `<label>${label}<input name="${q.id}_${bi+1}" /></label>`;
+          ${Array.from({ length: q.blanks }, (_, bi) => {
+            const label = q.blanks === 1 ? "Answer" : `Blank ${bi + 1}`;
+            return `<label>${label}<input name="${q.id}_${bi + 1}" /></label>`;
           }).join("")}
         </div>
       </div>`).join("");
@@ -168,7 +177,7 @@ if (currentPath.includes("exam.html")) {
       <div class="question-card">
         <label class="essay-toggle">
           <input type="checkbox" class="essay-select" value="${q.id}" />
-          <span>Answer Question ${i+1}: ${q.title}</span>
+          <span>Answer Question ${i + 1}: ${q.title}</span>
         </label>
         <p>${q.prompt.replace(/\n/g, "<br />")}</p>
         <textarea name="${q.id}" disabled placeholder="Select this essay question to enable the text area."></textarea>
@@ -204,14 +213,19 @@ if (currentPath.includes("exam.html")) {
 
     const fillBlanks = {};
     exam.blanks.forEach(q => {
-      fillBlanks[q.id] = Array.from({length: q.blanks}, (_, i) => 
-        String(data.get(`${q.id}_${i+1}`) || "").trim()
+      fillBlanks[q.id] = Array.from({ length: q.blanks }, (_, i) =>
+        String(data.get(`${q.id}_${i + 1}`) || "").trim()
       );
     });
 
     const essays = getSelectedEssays().map(id => {
       const q = exam.essays.find(item => item.id === id);
-      return { id, title: q.title, prompt: q.prompt, answer: String(data.get(id) || "").trim() };
+      return {
+        id,
+        title: q.title,
+        prompt: q.prompt,
+        answer: String(data.get(id) || "").trim()
+      };
     });
 
     return {
@@ -240,7 +254,16 @@ if (currentPath.includes("exam.html")) {
     const raw = localStorage.getItem(DRAFT_KEY);
     if (!raw) return false;
     let draft;
-    try { draft = JSON.parse(raw); } catch { localStorage.removeItem(DRAFT_KEY); return false; }
+    try { draft = JSON.parse(raw); } catch { 
+      localStorage.removeItem(DRAFT_KEY); 
+      return false; 
+    }
+
+    const currentId = localStorage.getItem("currentStudentId");
+    if (draft.student?.indexNumber !== currentId) {
+      localStorage.removeItem(DRAFT_KEY);
+      return false;
+    }
 
     isRestoringDraft = true;
 
@@ -254,7 +277,7 @@ if (currentPath.includes("exam.html")) {
 
     Object.entries(draft.fillBlanks || {}).forEach(([qId, vals]) => {
       vals.forEach((v, i) => {
-        const input = form.elements[`${qId}_${i+1}`];
+        const input = form.elements[`${qId}_${i + 1}`];
         if (input) input.value = v;
       });
     });
@@ -273,11 +296,11 @@ if (currentPath.includes("exam.html")) {
     return true;
   }
 
-  function formatTime(seconds) {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    return [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
+  function formatTime(totalSeconds) {
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
   }
 
   function startTimer() {
@@ -295,24 +318,47 @@ if (currentPath.includes("exam.html")) {
   }
 
   function updateSummary() {
-    const p = collectPayload();
-    const mcq = Object.values(p.answers).filter(Boolean).length;
-    const blanks = Object.values(p.fillBlanks).flat().filter(Boolean).length;
-    const essays = p.essays.length;
-    const words = p.essays.reduce((sum, e) => sum + (e.answer.split(/\s+/).filter(Boolean).length), 0);
+    const payload = collectPayload();
+    const mcqAnswered = Object.values(payload.answers).filter(Boolean).length;
+    const blankAnswered = Object.values(payload.fillBlanks).flat().filter(Boolean).length;
+    const essayCount = payload.essays.length;
+    const essayWords = payload.essays.reduce((sum, e) => sum + e.answer.split(/\s+/).filter(Boolean).length, 0);
 
-    const summary = document.getElementById("progressSummary");
-    if (summary) {
-      summary.innerHTML = `
-        <div class="summary-item"><span>Section A</span><strong>${mcq}/20</strong></div>
-        <div class="summary-item"><span>Section B</span><strong>${blanks}/20</strong></div>
-        <div class="summary-item"><span>Section C</span><strong>${essays}/4</strong></div>
-        <div class="summary-item"><span>Words</span><strong>${words}</strong></div>
+    const summaryEl = document.getElementById("progressSummary");
+    if (summaryEl) {
+      summaryEl.innerHTML = `
+        <div class="summary-item"><span>Section A</span><strong>${mcqAnswered}/20</strong><small>answered</small></div>
+        <div class="summary-item"><span>Section B</span><strong>${blankAnswered}/20</strong><small>completed</small></div>
+        <div class="summary-item"><span>Section C</span><strong>${essayCount}/4</strong><small>selected</small></div>
+        <div class="summary-item"><span>Essay Words</span><strong>${essayWords}</strong><small>written</small></div>
       `;
     }
   }
 
-  // Submit Handler - FIXED
+  // Navigation
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => setActiveSection(tab.dataset.target));
+  });
+
+  document.addEventListener("click", (e) => {
+    const nextBtn = e.target.closest(".next-section-btn");
+    const prevBtn = e.target.closest(".prev-section-btn");
+    if (nextBtn) setActiveSection(nextBtn.dataset.next);
+    if (prevBtn) setActiveSection(prevBtn.dataset.prev);
+  });
+
+  form.addEventListener("change", (e) => {
+    if (e.target.classList.contains("essay-select")) updateEssayControls();
+    updateSummary();
+    saveDraft();
+  });
+
+  form.addEventListener("input", () => {
+    updateSummary();
+    saveDraft();
+  });
+
+  // Submit
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     statusMessage.textContent = "";
@@ -321,7 +367,7 @@ if (currentPath.includes("exam.html")) {
     const payload = collectPayload();
 
     if (payload.essays.length !== 4 || payload.essays.some(e => !e.answer.trim())) {
-      statusMessage.textContent = "Please select and answer exactly 4 essays.";
+      statusMessage.textContent = "Please select and complete exactly 4 essays.";
       statusMessage.classList.add("error");
       return;
     }
@@ -341,11 +387,9 @@ if (currentPath.includes("exam.html")) {
 
       if (!response.ok) throw new Error(result.error || "Submission failed");
 
-      // Success - redirect to submitted page
       localStorage.removeItem(DRAFT_KEY);
       localStorage.removeItem("currentStudentId");
       window.location.href = `/submitted.html?confirmationId=${result.id}`;
-
     } catch (error) {
       statusMessage.textContent = error.message || "Submission failed. Please try again.";
       statusMessage.classList.add("error");
@@ -354,7 +398,7 @@ if (currentPath.includes("exam.html")) {
     }
   });
 
-  // Initialize
+  // Init Exam
   renderMcq();
   renderBlanks();
   renderEssays();
