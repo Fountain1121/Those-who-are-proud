@@ -1,263 +1,44 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Pastoral School Exam - app.js (Separated Pages Version)
+// ─────────────────────────────────────────────────────────────────────────────
+
 const exam = {
   durationSeconds: 2.5 * 60 * 60,
   mcq: [
-    {
-      id: "a1",
-      text: "The author uses Adolf Hitler's rise and fall to illustrate which key principle?",
-      options: [
-        "That political power is always corrupted by pride",
-        "That wars are always caused by economic factors",
-        "That delusions caused by pride take approximately ten years to fully unravel",
-        "That Germany was led by a Satanic leader"
-      ]
-    },
-    {
-      id: "a2",
-      text: "According to James 4:6, what does God give to humble people?",
-      options: ["Wisdom and understanding", "Wealth and long life", "Undeserved help and favor", "Peace and contentment"]
-    },
-    {
-      id: "a3",
-      text: "According to the author, the greatest person in the Kingdom of Heaven will be:",
-      options: [
-        "The person who prays the most",
-        "The person who gives the most to the church",
-        "The person who is the most humble",
-        "The person who wins the most souls"
-      ]
-    },
-    {
-      id: "a4",
-      text: "Which of the following best describes how the author personally applied the principle of copying in his own ministry?",
-      options: [
-        "He copied no one and developed all his methods from personal revelation",
-        "He copied Fred Price for teaching, Yonggi Cho for church growth, Benny Hinn for miracles, and Reinhard Bonnke for mass crusades",
-        "He copied only African ministers because he believed Western methods were irrelevant",
-        "He copied the methods of the Apostle Paul exclusively"
-      ]
-    },
-    {
-      id: "a5",
-      text: "What is the primary reason ministers stop learning and growing in the Lord, according to Bishop Dag Heward-Mills?",
-      options: [
-        "They become too busy with the work of ministry",
-        "They lack access to good books and resources",
-        "They stop learning at the rate at which they become proud",
-        "They reach a natural ceiling of spiritual development"
-      ]
-    },
-    {
-      id: "a6",
-      text: "What was the fatal error Rehoboam made that led to the loss of ten tribes of Israel?",
-      options: [
-        "He raised taxes on the people without justification",
-        "He went to war against neighboring nations unnecessarily",
-        "He rejected the counsel of the elders and followed the advice of young men to rule harshly",
-        "He abandoned the worship of God and served idols"
-      ]
-    },
-    {
-      id: "a7",
-      text: "The author specifically identifies which characteristic as a sign that a minister is \"puffed up like Korah\"?",
-      options: [
-        "Seeking to build the largest church in the city",
-        "Rising up to correct or challenge a spiritual authority that God has placed over them",
-        "Refusing to share the pulpit with other ministers",
-        "Demanding a higher salary from the church"
-      ]
-    },
-    {
-      id: "a8",
-      text: "According to 1 Timothy 3:6, what specific danger awaits a person who is lifted up with pride?",
-      options: [
-        "They will fall into financial ruin and poverty",
-        "They will fall into the condemnation of the devil",
-        "They will lose their anointing and calling from God",
-        "They will be rejected by their congregation"
-      ]
-    },
-    {
-      id: "a9",
-      text: "According to Luke 1:51, what does God do to the proud?",
-      options: [
-        "God corrects and disciplines them through suffering",
-        "God sends prophets to warn them before judging them",
-        "God scatters the proud in the imagination of their hearts",
-        "God removes their families and loved ones from them"
-      ]
-    },
-    {
-      id: "a10",
-      text: "According to Bishop Dag Heward-Mills, pride is described as:",
-      options: [
-        "A minor character flaw that can be easily corrected",
-        "The most deadly evil that afflicts the human race",
-        "A natural part of human development and growth",
-        "A problem that only affects leaders and politicians"
-      ]
-    },
-    {
-      id: "a11",
-      text: "The author states that the fundamental object of human history is best described as:",
-      options: [
-        "The pursuit of wealth and power by nations",
-        "The advancement of science and technology",
-        "The history of the manifestation of pride through satanic nature working in man",
-        "The story of God's redemption of mankind"
-      ]
-    },
-    {
-      id: "a12",
-      text: "According to Job 41:34, Satan is described as:",
-      options: [
-        "The father of lies and the ruler of darkness",
-        "A king over all the children of pride",
-        "The prince of the power of the air",
-        "The accuser of the brethren"
-      ]
-    },
-    {
-      id: "a13",
-      text: "The author teaches that humility must be practiced specifically:",
-      options: [
-        "In the sight of man so that others can see it",
-        "In the sight of the Lord and not in the sight of man",
-        "In the workplace so that colleagues respect you",
-        "In the church so that the pastor notices it"
-      ]
-    },
-    {
-      id: "a14",
-      text: "According to 1 Peter 5:5, humility is described as:",
-      options: [
-        "A way of thinking and speaking humbly",
-        "A spiritual cloak or covering that protects the believer",
-        "A gift given only to ministers of the gospel",
-        "A discipline that must be practiced daily"
-      ]
-    },
-    {
-      id: "a15",
-      text: "The author states that children are humble because they:",
-      options: [
-        "Are weak and have no strength of their own",
-        "Are ignorant of the ways of the world",
-        "Naturally possess the formula for humility that Jesus described",
-        "Have been taught humility by their parents"
-      ]
-    },
-    {
-      id: "a16",
-      text: "The author argues that Proverbs 13:10, \"Only by pride cometh contention\", applies most directly to which common human relationship?",
-      options: [
-        "The relationship between employers and employees",
-        "The relationship between politicians and citizens",
-        "The relationship between husbands and wives in marriage",
-        "The relationship between teachers and students"
-      ]
-    },
-    {
-      id: "a17",
-      text: "Queen Vashti was described as \"puffed up\" primarily because she:",
-      options: [
-        "Claimed to be more beautiful than the other women in the kingdom",
-        "Refused to obey the king's command and appear before him",
-        "Conspired against the king with the other princes",
-        "Demanded to be made co-ruler of the kingdom"
-      ]
-    },
-    {
-      id: "a18",
-      text: "What was the specific consequence that God brought upon Nebuchadnezzar because of his pride?",
-      options: [
-        "He was killed by his own servants",
-        "His kingdom was divided among his enemies",
-        "He was driven from men and dwelt with beasts, eating grass for seven years",
-        "He was blinded and imprisoned in the dungeon"
-      ]
-    },
-    {
-      id: "a19",
-      text: "The author argues that Belshazzar was puffed up most critically because:",
-      options: [
-        "He was younger and less experienced than his father",
-        "He did not learn from his father Nebuchadnezzar's mistakes even though he knew about them",
-        "He was influenced by evil advisers in his court",
-        "He had too much wealth and became complacent"
-      ]
-    },
-    {
-      id: "a20",
-      text: "According to Psalm 138:6, what does the Lord do to the proud?",
-      options: [
-        "He destroys them immediately with His wrath",
-        "He gives them over to their enemies",
-        "He knows them from afar; they lose closeness and access to Him",
-        "He removes their wealth and position"
-      ]
-    }
+    { id: "a1", text: "The author uses Adolf Hitler's rise and fall to illustrate which key principle?", options: ["That political power is always corrupted by pride", "That wars are always caused by economic factors", "That delusions caused by pride take approximately ten years to fully unravel", "That Germany was led by a Satanic leader"] },
+    { id: "a2", text: "According to James 4:6, what does God give to humble people?", options: ["Wisdom and understanding", "Wealth and long life", "Undeserved help and favor", "Peace and contentment"] },
+    { id: "a3", text: "According to the author, the greatest person in the Kingdom of Heaven will be:", options: ["The person who prays the most", "The person who gives the most to the church", "The person who is the most humble", "The person who wins the most souls"] },
+    { id: "a4", text: "Which of the following best describes how the author personally applied the principle of copying in his own ministry?", options: ["He copied no one and developed all his methods from personal revelation", "He copied Fred Price for teaching, Yonggi Cho for church growth, Benny Hinn for miracles, and Reinhard Bonnke for mass crusades", "He copied only African ministers because he believed Western methods were irrelevant", "He copied the methods of the Apostle Paul exclusively"] },
+    { id: "a5", text: "What is the primary reason ministers stop learning and growing in the Lord, according to Bishop Dag Heward-Mills?", options: ["They become too busy with the work of ministry", "They lack access to good books and resources", "They stop learning at the rate at which they become proud", "They reach a natural ceiling of spiritual development"] },
+    { id: "a6", text: "What was the fatal error Rehoboam made that led to the loss of ten tribes of Israel?", options: ["He raised taxes on the people without justification", "He went to war against neighboring nations unnecessarily", "He rejected the counsel of the elders and followed the advice of young men to rule harshly", "He abandoned the worship of God and served idols"] },
+    { id: "a7", text: "The author specifically identifies which characteristic as a sign that a minister is \"puffed up like Korah\"?", options: ["Seeking to build the largest church in the city", "Rising up to correct or challenge a spiritual authority that God has placed over them", "Refusing to share the pulpit with other ministers", "Demanding a higher salary from the church"] },
+    { id: "a8", text: "According to 1 Timothy 3:6, what specific danger awaits a person who is lifted up with pride?", options: ["They will fall into financial ruin and poverty", "They will fall into the condemnation of the devil", "They will lose their anointing and calling from God", "They will be rejected by their congregation"] },
+    { id: "a9", text: "According to Luke 1:51, what does God do to the proud?", options: ["God corrects and disciplines them through suffering", "God sends prophets to warn them before judging them", "God scatters the proud in the imagination of their hearts", "God removes their families and loved ones from them"] },
+    { id: "a10", text: "According to Bishop Dag Heward-Mills, pride is described as:", options: ["A minor character flaw that can be easily corrected", "The most deadly evil that afflicts the human race", "A natural part of human development and growth", "A problem that only affects leaders and politicians"] },
+    { id: "a11", text: "The author states that the fundamental object of human history is best described as:", options: ["The pursuit of wealth and power by nations", "The advancement of science and technology", "The history of the manifestation of pride through satanic nature working in man", "The story of God's redemption of mankind"] },
+    { id: "a12", text: "According to Job 41:34, Satan is described as:", options: ["The father of lies and the ruler of darkness", "A king over all the children of pride", "The prince of the power of the air", "The accuser of the brethren"] },
+    { id: "a13", text: "The author teaches that humility must be practiced specifically:", options: ["In the sight of man so that others can see it", "In the sight of the Lord and not in the sight of man", "In the workplace so that colleagues respect you", "In the church so that the pastor notices it"] },
+    { id: "a14", text: "According to 1 Peter 5:5, humility is described as:", options: ["A way of thinking and speaking humbly", "A spiritual cloak or covering that protects the believer", "A gift given only to ministers of the gospel", "A discipline that must be practiced daily"] },
+    { id: "a15", text: "The author states that children are humble because they:", options: ["Are weak and have no strength of their own", "Are ignorant of the ways of the world", "Naturally possess the formula for humility that Jesus described", "Have been taught humility by their parents"] },
+    { id: "a16", text: "The author argues that Proverbs 13:10, \"Only by pride cometh contention\", applies most directly to which common human relationship?", options: ["The relationship between employers and employees", "The relationship between politicians and citizens", "The relationship between husbands and wives in marriage", "The relationship between teachers and students"] },
+    { id: "a17", text: "Queen Vashti was described as \"puffed up\" primarily because she:", options: ["Claimed to be more beautiful than the other women in the kingdom", "Refused to obey the king's command and appear before him", "Conspired against the king with the other princes", "Demanded to be made co-ruler of the kingdom"] },
+    { id: "a18", text: "What was the specific consequence that God brought upon Nebuchadnezzar because of his pride?", options: ["He was killed by his own servants", "His kingdom was divided among his enemies", "He was driven from men and dwelt with beasts, eating grass for seven years", "He was blinded and imprisoned in the dungeon"] },
+    { id: "a19", text: "The author argues that Belshazzar was puffed up most critically because:", options: ["He was younger and less experienced than his father", "He did not learn from his father Nebuchadnezzar's mistakes even though he knew about them", "He was influenced by evil advisers in his court", "He had too much wealth and became complacent"] },
+    { id: "a20", text: "According to Psalm 138:6, what does the Lord do to the proud?", options: ["He destroys them immediately with His wrath", "He gives them over to their enemies", "He knows them from afar; they lose closeness and access to Him", "He removes their wealth and position"] }
   ],
   blanks: [
-    {
-      id: "b1",
-      text: "The author states that pride is the reason for the _____ and the _____ in our world.",
-      blanks: 2
-    },
-    {
-      id: "b2",
-      text: "The scripture in Proverbs 13:10 states: \"Only by pride cometh _____ but with the well advised is _____.\"",
-      blanks: 2
-    },
-    {
-      id: "b3",
-      text: "The author teaches that Satan fell out of Heaven through his _____, _____ and pride.",
-      blanks: 2
-    },
-    {
-      id: "b4",
-      text: "According to the author, every one that is proud in heart is an _____ to the Lord.",
-      blanks: 1
-    },
-    {
-      id: "b5",
-      text: "The author teaches that when the earth opens up and swallows a person because of pride, it is an illustration of falling into the _____ never to rise again.",
-      blanks: 1
-    },
-    {
-      id: "b6",
-      text: "The author states that proud people are isolate in their _____ and have no one to enjoy their lives with, having fallen from joy and fellowship into loneliness.",
-      blanks: 1
-    },
-    {
-      id: "b7",
-      text: "According to the author, to fall because of pride is to have your heaven turned into _____ and your earth turned into _____.",
-      blanks: 2
-    },
-    {
-      id: "b8",
-      text: "Bishop Dag Heward-Mills states that Korah was a man of _____ among the congregation, and yet his pride led him to rise up against _____.",
-      blanks: 2
-    },
-    {
-      id: "b9",
-      text: "According to the author, Nebuchadnezzar's pride was most evident when he declared: 'is not this great Babylon that I have built... by the _____ of my power, and for the _____ of my majesty?'",
-      blanks: 2
-    },
-    {
-      id: "b10",
-      text: "According to 1 Peter 5:6, believers are instructed: 'Humble yourselves therefore under the mighty hand of God, that he may _____ you in _____ time.'",
-      blanks: 2
-    },
-    {
-      id: "b11",
-      text: "According to the Author, the four ministers he copied in his own ministry were Fred Price, _____ Cho, Benny Hinn, and Reinhard _____.",
-      blanks: 2
-    },
-    {
-      id: "b12",
-      text: "The author argues that children copy easily and that is why they are able to learn _____ quickly.",
-      blanks: 1
-    }
+    { id: "b1", text: "The author states that pride is the reason for the _____ and the _____ in our world.", blanks: 2 },
+    { id: "b2", text: "The scripture in Proverbs 13:10 states: \"Only by pride cometh _____ but with the well advised is _____.\"", blanks: 2 },
+    { id: "b3", text: "The author teaches that Satan fell out of Heaven through his _____, _____ and pride.", blanks: 2 },
+    { id: "b4", text: "According to the author, every one that is proud in heart is an _____ to the Lord.", blanks: 1 },
+    { id: "b5", text: "The author teaches that when the earth opens up and swallows a person because of pride, it is an illustration of falling into the _____ never to rise again.", blanks: 1 },
+    { id: "b6", text: "The author states that proud people are isolate in their _____ and have no one to enjoy their lives with, having fallen from joy and fellowship into loneliness.", blanks: 1 },
+    { id: "b7", text: "According to the author, to fall because of pride is to have your heaven turned into _____ and your earth turned into _____.", blanks: 2 },
+    { id: "b8", text: "Bishop Dag Heward-Mills states that Korah was a man of _____ among the congregation, and yet his pride led him to rise up against _____.", blanks: 2 },
+    { id: "b9", text: "According to the author, Nebuchadnezzar's pride was most evident when he declared: 'is not this great Babylon that I have built... by the _____ of my power, and for the _____ of my majesty?'", blanks: 2 },
+    { id: "b10", text: "According to 1 Peter 5:6, believers are instructed: 'Humble yourselves therefore under the mighty hand of God, that he may _____ you in _____ time.'", blanks: 2 },
+    { id: "b11", text: "According to the Author, the four ministers he copied in his own ministry were Fred Price, _____ Cho, Benny Hinn, and Reinhard _____.", blanks: 2 },
+    { id: "b12", text: "The author argues that children copy easily and that is why they are able to learn _____ quickly.", blanks: 1 }
   ],
   essays: [
     {
@@ -304,341 +85,307 @@ let startedAt = null;
 let timerHandle = null;
 const DRAFT_KEY = "pastoralSchoolThoseWhoAreProudDraft.v2";
 let isRestoringDraft = false;
-let isSubmitted = false;
 
-// ─── DOM refs ─────────────────────────────────────────────────────────────────
-const loginView      = document.querySelector("#loginView");
-const examView       = document.querySelector("#examView");
-const submittedView  = document.querySelector("#submittedView");
-const loginForm      = document.querySelector("#loginForm");
-const loginIndexNum  = document.querySelector("#loginIndexNumber");
-const mcqList        = document.querySelector("#mcqList");
-const blankList      = document.querySelector("#blankList");
-const essayList      = document.querySelector("#essayList");
-const form           = document.querySelector("#examForm");
-const statusMessage  = document.querySelector("#statusMessage");
+const currentPath = window.location.pathname;
 
-document.querySelector('input[name="date"]').valueAsDate = new Date();
+// ================================================
+// LOGIN PAGE
+// ================================================
+if (currentPath.includes("index.html") || currentPath.endsWith("/")) {
+  const loginForm = document.getElementById("loginForm");
+  const loginIndexNum = document.getElementById("loginIndexNumber");
 
-// Force hide submitted view immediately
-submittedView.hidden = true;
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const studentId = loginIndexNum.value.trim();
+    if (!studentId) return;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function optionLetter(i) { return String.fromCharCode(65 + i); }
+    const btn = loginForm.querySelector("button");
+    btn.disabled = true;
+    btn.textContent = "Checking...";
 
-function formatTime(totalSeconds) {
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
-  return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
-}
+    try {
+      const res = await fetch(`/api/check-submitted?indexNumber=${encodeURIComponent(studentId)}`);
+      const data = await res.json();
+      if (data.submitted) {
+        window.location.href = `/submitted.html?confirmationId=${encodeURIComponent(data.confirmationId || "N/A")}`;
+        return;
+      }
+    } catch (err) {
+      console.warn("Submission check failed");
+    }
 
-// ─── Render ───────────────────────────────────────────────────────────────────
-function renderMcq() {
-  mcqList.innerHTML = exam.mcq.map((q, i) => `
-    <fieldset class="question-card">
-      <legend>${i + 1}. ${q.text}</legend>
-      ${q.options.map((opt, oi) => `
-        <label class="option">
-          <input type="radio" name="${q.id}" value="${optionLetter(oi)}" />
-          <span>${optionLetter(oi)}. ${opt}</span>
-        </label>`).join("")}
-    </fieldset>`).join("");
-}
-
-function renderBlanks() {
-  blankList.innerHTML = exam.blanks.map((q, i) => `
-    <div class="question-card">
-      <p class="question-title">${i + 1}. ${q.text}</p>
-      <div class="blank-inputs">
-        ${Array.from({ length: q.blanks }, (_, bi) => {
-          const label = q.blanks === 1 ? "Answer" : `Blank ${bi + 1}`;
-          return `<label>${label}<input name="${q.id}_${bi + 1}" /></label>`;
-        }).join("")}
-      </div>
-    </div>`).join("");
-}
-
-function renderEssays() {
-  essayList.innerHTML = exam.essays.map((q, i) => `
-    <div class="question-card">
-      <label class="essay-toggle">
-        <input type="checkbox" class="essay-select" value="${q.id}" />
-        <span>Answer Question ${i + 1}: ${q.title}</span>
-      </label>
-      <p>${q.prompt.replace(/\n/g, "<br />")}</p>
-      <textarea name="${q.id}" disabled placeholder="Select this essay question to enable the text area."></textarea>
-    </div>`).join("");
-}
-
-// ─── Navigation & Controls ───────────────────────────────────────────────────
-function setActiveSection(id, shouldSave = true) {
-  document.querySelectorAll(".section").forEach(s => s.classList.toggle("active", s.id === id));
-  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.target === id));
-  if (id === "review") updateSummary();
-  if (shouldSave) saveDraft();
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => setActiveSection(tab.dataset.target)));
-
-document.addEventListener("click", e => {
-  const nextBtn = e.target.closest(".next-section-btn");
-  const prevBtn = e.target.closest(".prev-section-btn");
-  if (nextBtn) setActiveSection(nextBtn.dataset.next);
-  if (prevBtn) setActiveSection(prevBtn.dataset.prev);
-});
-
-function getSelectedEssays() {
-  return [...document.querySelectorAll(".essay-select:checked")].map(cb => cb.value);
-}
-
-function updateEssayControls() {
-  const selected = getSelectedEssays();
-  document.querySelectorAll(".essay-select").forEach(cb => {
-    const ta = document.querySelector(`textarea[name="${cb.value}"]`);
-    ta.disabled = !cb.checked;
-    if (!cb.checked) ta.value = "";
-    cb.disabled = !cb.checked && selected.length >= 4;
+    localStorage.setItem("currentStudentId", studentId);
+    window.location.href = "/exam.html";
   });
-  updateSummary();
 }
 
-// ─── Payload & Draft ─────────────────────────────────────────────────────────
-function collectPayload() {
-  const data = new FormData(form);
-  const answers = {};
-  exam.mcq.forEach(q => answers[q.id] = data.get(q.id) || "");
+// ================================================
+// EXAM PAGE
+// ================================================
+if (currentPath.includes("exam.html")) {
+  const mcqList = document.getElementById("mcqList");
+  const blankList = document.getElementById("blankList");
+  const essayList = document.getElementById("essayList");
+  const form = document.getElementById("examForm");
+  const statusMessage = document.getElementById("statusMessage");
 
-  const fillBlanks = {};
-  exam.blanks.forEach(q => {
-    fillBlanks[q.id] = Array.from({ length: q.blanks }, (_, i) =>
-      String(data.get(`${q.id}_${i + 1}`) || "").trim()
-    );
-  });
-
-  const essays = getSelectedEssays().map(id => {
-    const q = exam.essays.find(item => item.id === id);
-    return { id, title: q.title, prompt: q.prompt, answer: String(data.get(id) || "").trim() };
-  });
-
-  return {
-    student: {
-      indexNumber: String(data.get("indexNumber") || "").trim(),
-      date: String(data.get("date") || "").trim()
-    },
-    answers,
-    fillBlanks,
-    essays,
-    elapsedSeconds: startedAt ? Math.floor((Date.now() - startedAt) / 1000) : 0
-  };
-}
-
-function saveDraft() {
-  if (isRestoringDraft || isSubmitted) return;
-  const payload = collectPayload();
-  const hasStarted = Boolean(payload.student.indexNumber || loginIndexNum.value.trim());
-  if (!hasStarted) return;
-
-  localStorage.setItem(DRAFT_KEY, JSON.stringify({
-    ...payload,
-    loginIndexNumber: loginIndexNum.value.trim(),
-    startedAt,
-    activeSection: document.querySelector(".section.active")?.id || "sectionA",
-    savedAt: new Date().toISOString()
-  }));
-}
-
-function restoreDraft() {
-  const raw = localStorage.getItem(DRAFT_KEY);
-  if (!raw) return false;
-  let draft;
-  try { draft = JSON.parse(raw); } catch { localStorage.removeItem(DRAFT_KEY); return false; }
-
-  isRestoringDraft = true;
-  const studentId = draft.student?.indexNumber || draft.loginIndexNumber || "";
-  if (!studentId) { isRestoringDraft = false; return false; }
-
-  loginIndexNum.value = studentId;
-  form.elements.indexNumber.value = studentId;
-  form.elements.date.value = draft.student?.date || form.elements.date.value;
-
-  Object.entries(draft.answers || {}).forEach(([qId, val]) => {
-    const radio = form.querySelector(`input[name="${qId}"][value="${val}"]`);
-    if (radio) radio.checked = true;
-  });
-
-  Object.entries(draft.fillBlanks || {}).forEach(([qId, vals]) => {
-    vals.forEach((v, i) => {
-      const input = form.elements[`${qId}_${i + 1}`];
-      if (input) input.value = v;
-    });
-  });
-
-  (draft.essays || []).forEach(essay => {
-    const cb = form.querySelector(`.essay-select[value="${essay.id}"]`);
-    const ta = form.elements[essay.id];
-    if (cb) cb.checked = true;
-    if (ta) ta.value = essay.answer || "";
-  });
-
-  startedAt = Number(draft.startedAt) || null;
-
-  loginView.hidden = true;
-  examView.hidden = false;
-  submittedView.hidden = true;
-
-  if (!startedAt) startedAt = Date.now();
-  startTimer();
-
-  updateEssayControls();
-  setActiveSection(draft.activeSection || "sectionA", false);
-  updateSummary();
-
-  isRestoringDraft = false;
-  return true;
-}
-
-// ─── Timer ────────────────────────────────────────────────────────────────────
-function startTimer() {
-  if (timerHandle) clearInterval(timerHandle);
-  tickTimer();
-  timerHandle = setInterval(tickTimer, 1000);
-}
-
-function tickTimer() {
-  if (!startedAt) return;
-  const elapsed = Math.floor((Date.now() - startedAt) / 1000);
-  const remaining = Math.max(0, exam.durationSeconds - elapsed);
-  document.querySelector("#timer").textContent = formatTime(remaining);
-  if (remaining === 0) {
-    statusMessage.textContent = "Time is up. Please submit your exam now.";
-    statusMessage.classList.add("error");
-    clearInterval(timerHandle);
+  // Set student ID
+  const savedId = localStorage.getItem("currentStudentId");
+  if (savedId) {
+    const idxInput = form.querySelector('input[name="indexNumber"]');
+    if (idxInput) idxInput.value = savedId;
   }
-}
+  document.querySelector('input[name="date"]').valueAsDate = new Date();
 
-// ─── Summary ──────────────────────────────────────────────────────────────────
-function updateSummary() {
-  const payload = collectPayload();
-  const mcqAnswered = Object.values(payload.answers).filter(Boolean).length;
-  const blankAnswered = Object.values(payload.fillBlanks).flat().filter(Boolean).length;
-  const essayCount = payload.essays.length;
-  const essayWords = payload.essays.reduce((sum, e) => sum + e.answer.split(/\s+/).filter(Boolean).length, 0, 0);
+  function optionLetter(i) { return String.fromCharCode(65 + i); }
 
-  document.querySelector("#progressSummary").innerHTML = `
-    <div class="summary-item"><span>Section A</span><strong>${mcqAnswered}/20</strong><small>answered</small></div>
-    <div class="summary-item"><span>Section B</span><strong>${blankAnswered}/20</strong><small>completed</small></div>
-    <div class="summary-item"><span>Section C</span><strong>${essayCount}/4</strong><small>selected</small></div>
-    <div class="summary-item"><span>Essay Words</span><strong>${essayWords}</strong><small>written</small></div>
-  `;
-}
+  function renderMcq() {
+    mcqList.innerHTML = exam.mcq.map((q, i) => `
+      <fieldset class="question-card">
+        <legend>${i+1}. ${q.text}</legend>
+        ${q.options.map((opt, oi) => `
+          <label class="option">
+            <input type="radio" name="${q.id}" value="${optionLetter(oi)}" />
+            <span>${optionLetter(oi)}. ${opt}</span>
+          </label>`).join("")}
+      </fieldset>`).join("");
+  }
 
-// ─── Login ────────────────────────────────────────────────────────────────────
-loginForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const studentId = loginIndexNum.value.trim();
-  if (!studentId) { loginIndexNum.focus(); return; }
+  function renderBlanks() {
+    blankList.innerHTML = exam.blanks.map((q, i) => `
+      <div class="question-card">
+        <p class="question-title">${i+1}. ${q.text}</p>
+        <div class="blank-inputs">
+          ${Array.from({length: q.blanks}, (_, bi) => {
+            const label = q.blanks === 1 ? "Answer" : `Blank ${bi+1}`;
+            return `<label>${label}<input name="${q.id}_${bi+1}" /></label>`;
+          }).join("")}
+        </div>
+      </div>`).join("");
+  }
 
-  const btn = loginForm.querySelector("button");
-  btn.disabled = true;
-  btn.textContent = "Checking...";
+  function renderEssays() {
+    essayList.innerHTML = exam.essays.map((q, i) => `
+      <div class="question-card">
+        <label class="essay-toggle">
+          <input type="checkbox" class="essay-select" value="${q.id}" />
+          <span>Answer Question ${i+1}: ${q.title}</span>
+        </label>
+        <p>${q.prompt.replace(/\n/g, "<br>")}</p>
+        <textarea name="${q.id}" disabled placeholder="Select this essay to start writing..."></textarea>
+      </div>`).join("");
+  }
 
-  try {
-    const res = await fetch(`/api/check-submitted?indexNumber=${encodeURIComponent(studentId)}`);
-    const data = await res.json();
-    if (data.submitted) {
-      loginView.hidden = true;
-      submittedView.hidden = false;
-      document.querySelector("#submittedConfirmId").textContent = `Confirmation ID: ${data.confirmationId || "N/A"}`;
-      btn.disabled = false;
-      btn.textContent = "Continue to Exam";
+  function setActiveSection(id) {
+    document.querySelectorAll(".section").forEach(s => s.classList.toggle("active", s.id === id));
+    document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.target === id));
+    if (id === "review") updateSummary();
+    saveDraft();
+  }
+
+  function getSelectedEssays() {
+    return [...document.querySelectorAll(".essay-select:checked")].map(cb => cb.value);
+  }
+
+  function updateEssayControls() {
+    const selected = getSelectedEssays();
+    document.querySelectorAll(".essay-select").forEach(cb => {
+      const ta = document.querySelector(`textarea[name="${cb.value}"]`);
+      ta.disabled = !cb.checked;
+      if (!cb.checked) ta.value = "";
+      cb.disabled = !cb.checked && selected.length >= 4;
+    });
+    updateSummary();
+  }
+
+  function collectPayload() {
+    const data = new FormData(form);
+    const answers = {};
+    exam.mcq.forEach(q => answers[q.id] = data.get(q.id) || "");
+
+    const fillBlanks = {};
+    exam.blanks.forEach(q => {
+      fillBlanks[q.id] = Array.from({length: q.blanks}, (_, i) => 
+        String(data.get(`${q.id}_${i+1}`) || "").trim()
+      );
+    });
+
+    const essays = getSelectedEssays().map(id => {
+      const q = exam.essays.find(item => item.id === id);
+      return { id, title: q.title, prompt: q.prompt, answer: String(data.get(id) || "").trim() };
+    });
+
+    return {
+      student: {
+        indexNumber: String(data.get("indexNumber") || "").trim(),
+        date: String(data.get("date") || "").trim()
+      },
+      answers,
+      fillBlanks,
+      essays,
+      elapsedSeconds: startedAt ? Math.floor((Date.now() - startedAt) / 1000) : 0
+    };
+  }
+
+  function saveDraft() {
+    if (isRestoringDraft) return;
+    const payload = collectPayload();
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      ...payload,
+      startedAt,
+      activeSection: document.querySelector(".section.active")?.id || "sectionA"
+    }));
+  }
+
+  function restoreDraft() {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return false;
+    let draft;
+    try { draft = JSON.parse(raw); } catch { localStorage.removeItem(DRAFT_KEY); return false; }
+
+    isRestoringDraft = true;
+    const indexInput = form.querySelector('input[name="indexNumber"]');
+    if (indexInput) indexInput.value = draft.student?.indexNumber || "";
+
+    // Restore MCQ, Blanks, Essays...
+    Object.entries(draft.answers || {}).forEach(([qId, val]) => {
+      const radio = form.querySelector(`input[name="${qId}"][value="${val}"]`);
+      if (radio) radio.checked = true;
+    });
+
+    Object.entries(draft.fillBlanks || {}).forEach(([qId, vals]) => {
+      vals.forEach((v, i) => {
+        const input = form.elements[`${qId}_${i+1}`];
+        if (input) input.value = v;
+      });
+    });
+
+    (draft.essays || []).forEach(essay => {
+      const cb = form.querySelector(`.essay-select[value="${essay.id}"]`);
+      const ta = form.elements[essay.id];
+      if (cb) cb.checked = true;
+      if (ta) ta.value = essay.answer || "";
+    });
+
+    startedAt = Number(draft.startedAt) || Date.now();
+    updateEssayControls();
+    setActiveSection(draft.activeSection || "sectionA");
+    isRestoringDraft = false;
+    return true;
+  }
+
+  function formatTime(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
+  }
+
+  function startTimer() {
+    if (timerHandle) clearInterval(timerHandle);
+    tickTimer();
+    timerHandle = setInterval(tickTimer, 1000);
+  }
+
+  function tickTimer() {
+    if (!startedAt) return;
+    const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+    const remaining = Math.max(0, exam.durationSeconds - elapsed);
+    document.getElementById("timer").textContent = formatTime(remaining);
+    if (remaining <= 0) clearInterval(timerHandle);
+  }
+
+  function updateSummary() {
+    const p = collectPayload();
+    const mcq = Object.values(p.answers).filter(Boolean).length;
+    const blanks = Object.values(p.fillBlanks).flat().filter(Boolean).length;
+    const essays = p.essays.length;
+    const words = p.essays.reduce((sum, e) => sum + (e.answer.split(/\s+/).length), 0);
+
+    document.getElementById("progressSummary").innerHTML = `
+      <div class="summary-item"><span>Section A</span><strong>${mcq}/20</strong></div>
+      <div class="summary-item"><span>Section B</span><strong>${blanks}/20</strong></div>
+      <div class="summary-item"><span>Section C</span><strong>${essays}/4</strong></div>
+      <div class="summary-item"><span>Words</span><strong>${words}</strong></div>
+    `;
+  }
+
+  // Event Listeners
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => setActiveSection(tab.dataset.target));
+  });
+
+  document.addEventListener("click", e => {
+    if (e.target.closest(".next-section-btn")) setActiveSection(e.target.closest(".next-section-btn").dataset.next);
+    if (e.target.closest(".prev-section-btn")) setActiveSection(e.target.closest(".prev-section-btn").dataset.prev);
+  });
+
+  form.addEventListener("change", e => {
+    if (e.target.classList.contains("essay-select")) updateEssayControls();
+    updateSummary();
+    saveDraft();
+  });
+
+  form.addEventListener("input", () => { updateSummary(); saveDraft(); });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const payload = collectPayload();
+
+    if (payload.essays.length !== 4 || payload.essays.some(e => !e.answer.trim())) {
+      statusMessage.textContent = "Please answer exactly 4 essays.";
+      statusMessage.classList.add("error");
       return;
     }
-  } catch (e) { console.warn("Check failed"); }
 
-  form.elements.indexNumber.value = studentId;
-  loginView.hidden = true;
-  examView.hidden = false;
-  submittedView.hidden = true;
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = "Submitting...";
 
-  if (!startedAt) startedAt = Date.now();
-  startTimer();
-  saveDraft();
+    try {
+      const res = await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = await res.json();
 
-  btn.disabled = false;
-  btn.textContent = "Continue to Exam";
-});
+      if (!res.ok) throw new Error(result.error || "Failed");
 
-// ─── Form Events ──────────────────────────────────────────────────────────────
-form.addEventListener("change", e => {
-  if (e.target.classList.contains("essay-select")) updateEssayControls();
+      localStorage.removeItem(DRAFT_KEY);
+      localStorage.removeItem("currentStudentId");
+      window.location.href = `/submitted.html?confirmationId=${result.id}`;
+    } catch (err) {
+      statusMessage.textContent = err.message;
+      statusMessage.classList.add("error");
+      btn.disabled = false;
+      btn.textContent = "Submit Exam";
+    }
+  });
+
+  // Initialize Exam Page
+  renderMcq();
+  renderBlanks();
+  renderEssays();
+  updateEssayControls();
   updateSummary();
-  saveDraft();
-});
-form.addEventListener("input", () => { updateSummary(); saveDraft(); });
-window.addEventListener("beforeunload", saveDraft);
+  document.getElementById("timer").textContent = formatTime(exam.durationSeconds);
 
-// ─── Submit ───────────────────────────────────────────────────────────────────
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  statusMessage.textContent = "";
-  statusMessage.classList.remove("error");
-
-  const payload = collectPayload();
-
-  if (payload.essays.length !== 4) {
-    statusMessage.textContent = "Please select exactly four essay questions.";
-    statusMessage.classList.add("error");
-    return;
+  if (!restoreDraft()) {
+    startedAt = Date.now();
+    startTimer();
+  } else {
+    startTimer();
   }
-  if (payload.essays.some(e => !e.answer.trim())) {
-    statusMessage.textContent = "Please complete all selected essays.";
-    statusMessage.classList.add("error");
-    return;
-  }
+}
 
-  const submitBtn = form.querySelector('button[type="submit"]');
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Submitting…";
-
-  try {
-    const response = await fetch("/api/submissions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "Submission failed.");
-
-    isSubmitted = true;
-    clearInterval(timerHandle);
-    localStorage.removeItem(DRAFT_KEY);
-
-    examView.hidden = true;
-    submittedView.hidden = false;
-    document.querySelector("#submittedConfirmId").textContent = `Confirmation ID: ${result.id}`;
-
-  } catch (error) {
-    statusMessage.textContent = error.message;
-    statusMessage.classList.add("error");
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit Exam";
-  }
-});
-
-// ─── Init ─────────────────────────────────────────────────────────────────────
-renderMcq();
-renderBlanks();
-renderEssays();
-updateEssayControls();
-updateSummary();
-document.querySelector("#timer").textContent = formatTime(exam.durationSeconds);
-
-submittedView.hidden = true;
-
-if (!restoreDraft()) {
-  loginView.hidden = false;
-  examView.hidden = true;
-  submittedView.hidden = true;
+// ================================================
+// SUBMITTED PAGE
+// ================================================
+if (currentPath.includes("submitted.html")) {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("confirmationId");
+  const el = document.getElementById("submittedConfirmId");
+  if (el && id) el.textContent = `Confirmation ID: ${id}`;
 }

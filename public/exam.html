@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Those Who Are Proud — Exam</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div id="examView" class="app-view">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Pastoral School Examination</p>
+        <h1>Those Who Are Proud</h1>
+      </div>
+      <div class="timer" aria-live="polite">
+        <span>Time Left</span>
+        <strong id="timer">02:30:00</strong>
+      </div>
+    </header>
+
+    <main class="exam-layout">
+      <aside class="course-rail" aria-label="Exam navigation">
+        <div class="course-card">
+          <p class="eyebrow">Course Assessment</p>
+          <h2>Those Who Are Proud</h2>
+          <p>Complete every required section before submitting.</p>
+          <div class="rail-progress" aria-hidden="true">
+            <span></span>
+          </div>
+        </div>
+        <nav class="tabs" aria-label="Exam sections">
+          <button type="button" class="tab active" data-target="sectionA">
+            <span>Section A</span>
+            <small>Multiple choice</small>
+          </button>
+          <button type="button" class="tab" data-target="sectionB">
+            <span>Section B</span>
+            <small>Fill in blanks</small>
+          </button>
+          <button type="button" class="tab" data-target="sectionC">
+            <span>Section C</span>
+            <small>Essays</small>
+          </button>
+          <button type="button" class="tab" data-target="review">
+            <span>Review</span>
+            <small>Submit exam</small>
+          </button>
+        </nav>
+      </aside>
+
+      <form id="examForm" class="exam-shell">
+        <section class="panel student-panel">
+          <div>
+            <p class="eyebrow">Student Workspace</p>
+            <h2>Exam Details</h2>
+            <p>Duration: 2 hours, 30 minutes. Answer all of Sections A and B, then answer any four questions in Section C.</p>
+          </div>
+          <label>
+            Index Number
+            <input name="indexNumber" readonly required />
+          </label>
+          <label>
+            Date
+            <input name="date" type="date" required />
+          </label>
+        </section>
+
+        <section id="sectionA" class="section active">
+          <div class="section-heading">
+            <h2>Section A: Multiple Choice Questions</h2>
+            <p>20 questions &mdash; ½ mark each &mdash; Total: 10 marks</p>
+          </div>
+          <div id="mcqList" class="question-list"></div>
+          <div class="section-nav">
+            <button type="button" class="primary next-section-btn" data-next="sectionB">Next: Section B →</button>
+          </div>
+        </section>
+
+        <section id="sectionB" class="section">
+          <div class="section-heading">
+            <h2>Section B: Fill-In-The-Blank Questions</h2>
+            <p>20 blank spaces &mdash; ½ mark each &mdash; Total: 10 marks</p>
+          </div>
+          <div id="blankList" class="question-list"></div>
+          <div class="section-nav">
+            <button type="button" class="secondary prev-section-btn" data-prev="sectionA">← Back: Section A</button>
+            <button type="button" class="primary next-section-btn" data-next="sectionC">Next: Section C →</button>
+          </div>
+        </section>
+
+        <section id="sectionC" class="section">
+          <div class="section-heading">
+            <h2>Section C: Essay Questions</h2>
+            <p>Total: 80 marks. Answer any four questions. Each question carries 20 marks.</p>
+          </div>
+          <div id="essayList" class="question-list"></div>
+          <div class="section-nav">
+            <button type="button" class="secondary prev-section-btn" data-prev="sectionB">← Back: Section B</button>
+            <button type="button" class="primary next-section-btn" data-next="review">Review &amp; Submit →</button>
+          </div>
+        </section>
+
+        <section id="review" class="section">
+          <div class="section-heading">
+            <h2>Review and Submit</h2>
+            <p>Check your progress before submitting. You will receive a confirmation ID after a successful submission.</p>
+          </div>
+          <div id="progressSummary" class="summary-grid"></div>
+          <div class="actions">
+            <button type="button" class="secondary prev-section-btn" data-prev="sectionC">← Back: Section C</button>
+            <button type="submit" class="primary">Submit Exam</button>
+          </div>
+          <p id="statusMessage" class="status" role="status"></p>
+        </section>
+      </form>
+    </main>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
