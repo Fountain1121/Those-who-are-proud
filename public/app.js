@@ -301,6 +301,10 @@ const exam = {
 
 let startedAt = null;
 let timerHandle = null;
+const DRAFT_KEY = "pastoralSchoolThoseWhoAreProudDraft.v1";
+let isRestoringDraft = false;
+let isSubmitted = false;
+
 const loginView = document.querySelector("#loginView");
 const examView = document.querySelector("#examView");
 const loginForm = document.querySelector("#loginForm");
@@ -370,7 +374,7 @@ function renderEssays() {
     .join("");
 }
 
-function setActiveSection(id) {
+function setActiveSection(id, shouldSave = true) {
   document.querySelectorAll(".section").forEach((section) => {
     section.classList.toggle("active", section.id === id);
   });
@@ -378,6 +382,7 @@ function setActiveSection(id) {
     tab.classList.toggle("active", tab.dataset.target === id);
   });
   if (id === "review") updateSummary();
+  if (shouldSave) saveDraft();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -431,6 +436,89 @@ function collectPayload() {
     essays,
     elapsedSeconds: startedAt ? Math.floor((Date.now() - startedAt) / 1000) : 0
   };
+}
+
+function getActiveSectionId() {
+  return document.querySelector(".section.active")?.id || "sectionA";
+}
+
+function saveDraft() {
+  if (isRestoringDraft || isSubmitted) return;
+
+  const payload = collectPayload();
+  const hasStarted = Boolean(payload.student.indexNumber || loginIndexNumber.value.trim());
+  const hasAnswers =
+    Object.values(payload.answers).some(Boolean) ||
+    Object.values(payload.fillBlanks).flat().some(Boolean) ||
+    payload.essays.some((essay) => essay.answer);
+
+  if (!hasStarted && !hasAnswers) return;
+
+  const draft = {
+    ...payload,
+    loginIndexNumber: loginIndexNumber.value.trim(),
+    startedAt,
+    activeSection: getActiveSectionId(),
+    savedAt: new Date().toISOString()
+  };
+
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+}
+
+function restoreDraft() {
+  const rawDraft = localStorage.getItem(DRAFT_KEY);
+  if (!rawDraft) return false;
+
+  let draft;
+  try {
+    draft = JSON.parse(rawDraft);
+  } catch {
+    localStorage.removeItem(DRAFT_KEY);
+    return false;
+  }
+
+  isRestoringDraft = true;
+
+  const student = draft.student || {};
+  const studentId = student.indexNumber || draft.loginIndexNumber || "";
+  loginIndexNumber.value = studentId;
+  form.elements.fullName.value = student.fullName || "";
+  form.elements.indexNumber.value = studentId;
+  form.elements.date.value = student.date || form.elements.date.value;
+
+  Object.entries(draft.answers || {}).forEach(([questionId, value]) => {
+    const radio = form.querySelector(`input[name="${questionId}"][value="${value}"]`);
+    if (radio) radio.checked = true;
+  });
+
+  Object.entries(draft.fillBlanks || {}).forEach(([questionId, values]) => {
+    values.forEach((value, index) => {
+      const input = form.elements[`${questionId}_${index + 1}`];
+      if (input) input.value = value;
+    });
+  });
+
+  (draft.essays || []).forEach((essay) => {
+    const checkbox = form.querySelector(`.essay-select[value="${essay.id}"]`);
+    const textarea = form.elements[essay.id];
+    if (checkbox) checkbox.checked = true;
+    if (textarea) textarea.value = essay.answer || "";
+  });
+
+  startedAt = Number(draft.startedAt) || Date.now();
+
+  if (studentId) {
+    loginView.hidden = true;
+    examView.hidden = false;
+    timerHandle = setInterval(tickTimer, 1000);
+    tickTimer();
+  }
+
+  updateEssayControls();
+  setActiveSection(draft.activeSection || "sectionA", false);
+  updateSummary();
+  isRestoringDraft = false;
+  return true;
 }
 
 function updateSummary() {
@@ -500,9 +588,11 @@ loginForm.addEventListener("submit", (event) => {
   form.elements.indexNumber.value = studentId;
   loginView.hidden = true;
   examView.hidden = false;
-  startedAt = Date.now();
+  startedAt = startedAt || Date.now();
   tickTimer();
+  if (timerHandle) clearInterval(timerHandle);
   timerHandle = setInterval(tickTimer, 1000);
+  saveDraft();
   form.elements.fullName.focus();
 });
 
@@ -511,9 +601,15 @@ document.querySelector("#printBtn").addEventListener("click", () => window.print
 form.addEventListener("change", (event) => {
   if (event.target.classList.contains("essay-select")) updateEssayControls();
   updateSummary();
+  saveDraft();
 });
 
-form.addEventListener("input", updateSummary);
+form.addEventListener("input", () => {
+  updateSummary();
+  saveDraft();
+});
+
+window.addEventListener("beforeunload", saveDraft);
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -541,6 +637,8 @@ form.addEventListener("submit", async (event) => {
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || "Submission failed.");
     statusMessage.textContent = `Submitted successfully. Confirmation ID: ${result.id}`;
+    isSubmitted = true;
+    localStorage.removeItem(DRAFT_KEY);
     form.querySelectorAll("input, textarea, button").forEach((control) => {
       if (control.id !== "printBtn") control.disabled = true;
     });
@@ -558,3 +656,4 @@ renderEssays();
 updateEssayControls();
 updateSummary();
 document.querySelector("#timer").textContent = formatTime(exam.durationSeconds);
+restoreDraft();
