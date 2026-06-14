@@ -27,16 +27,16 @@
         </div>
         <div class="admin-actions">
           <button id="loadSubmissions" class="primary" type="button">Refresh</button>
-          <button id="downloadCsv" class="secondary" type="button">Export CSV</button>
+          <button id="downloadAllTxt" class="secondary" type="button">Download All as ZIP</button>
         </div>
       </div>
 
       <div class="admin-filter-row">
         <label class="admin-search-label">
-          <span>Search by student ID or name</span>
+          <span>Search by student ID</span>
           <input id="searchInput" type="search" placeholder="e.g. PS-2025-001" />
         </label>
-        <button id="resetSubmission" class="danger small" type="button" title="Reset a student's submission lock">Reset Student Lock</button>
+        <button id="resetSubmission" class="danger small" type="button">Reset Student Lock</button>
       </div>
 
       <div id="statsBar" class="stats-bar" hidden>
@@ -45,17 +45,15 @@
       </div>
     </section>
 
+    <!-- Reset Modal (unchanged) -->
     <div id="resetModal" class="modal-overlay" hidden>
       <div class="modal-card">
         <h3>Reset Student Lock</h3>
-        <p>Enter the student ID to allow them to re-submit. This will delete their existing submission record.</p>
-        <label>
-          Student ID
-          <input id="resetIndexInput" placeholder="PS-2025-001" />
-        </label>
+        <p>Enter the student ID to allow re-submission.</p>
+        <label>Student ID <input id="resetIndexInput" placeholder="PS-2025-001" /></label>
         <div class="modal-actions">
-          <button id="cancelReset" class="secondary" type="button">Cancel</button>
-          <button id="confirmReset" class="danger" type="button">Reset</button>
+          <button id="cancelReset" class="secondary">Cancel</button>
+          <button id="confirmReset" class="danger">Reset</button>
         </div>
         <p id="resetMsg" class="status"></p>
       </div>

@@ -733,3 +733,30 @@ legend, .question-title {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+.submission-card summary:hover {
+  background: var(--accent-light);
+  cursor: pointer;
+}
+
+.submission-actions button {
+  transition: all 0.2s;
+}
+
+.submission-actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-actions button {
+  transition: all 0.2s;
+}
+
+.stats-bar {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

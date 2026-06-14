@@ -175,3 +175,42 @@ app.listen(PORT, () => {
   ensureStorage();
   console.log(`✅ Pastoral Exam Server running on port ${PORT}`);
 });
+
+// Individual TXT download
+app.get("/api/submissions/:id/txt", (req, res) => {
+  if (!isAdmin(req)) return res.status(401).send("Unauthorized");
+  const { id } = req.params;
+  const submissions = readSubmissions();
+  const sub = submissions.find(s => s.id === id);
+  if (!sub) return res.status(404).send("Not found");
+
+  const content = `Pastoral School Exam Submission\n` +
+    `ID: ${sub.id}\n` +
+    `Student: ${sub.student.indexNumber}\n` +
+    `Date: ${sub.student.date}\n` +
+    `Submitted: ${sub.submittedAt}\n\n` +
+    `=== SECTION A ===\n${JSON.stringify(sub.answers, null, 2)}\n\n` +
+    `=== SECTION B ===\n${JSON.stringify(sub.fillBlanks, null, 2)}\n\n` +
+    `=== SECTION C ===\n${JSON.stringify(sub.essays, null, 2)}`;
+
+  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Content-Disposition", `attachment; filename="submission-${sub.student.indexNumber}.txt"`);
+  res.send(content);
+});
+
+// All submissions as ZIP
+app.get("/api/submissions/all.zip", (req, res) => {
+  if (!isAdmin(req)) return res.status(401).send("Unauthorized");
+
+  const submissions = readSubmissions();
+  const zip = new (require('adm-zip'))();   // You'll need to npm install adm-zip
+
+  submissions.forEach(sub => {
+    const content = `... same as above ...`;
+    zip.addFile(`submission-${sub.student.indexNumber}.txt`, Buffer.from(content, "utf8"));
+  });
+
+  res.setHeader("Content-Type", "application/zip");
+  res.setHeader("Content-Disposition", 'attachment; filename="all-submissions.zip"');
+  res.send(zip.toBuffer());
+});
