@@ -1,73 +1,69 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Exam Admin — Pastoral School</title>
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Pastoral School Examination</p>
-        <h1>Submission Admin</h1>
-      </div>
-      <nav class="topbar-nav">
-        <a class="admin-link" href="/">← Exam</a>
-        <button id="logoutBtn" class="secondary small" type="button">Log Out</button>
-      </nav>
-    </header>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Exam Admin — Pastoral School</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Pastoral School Examination</p>
+      <h1>Submission Admin</h1>
+    </div>
+    <nav class="topbar-nav">
+      <a class="admin-link" href="/">← Exam</a>
+      <button id="logoutBtn" class="secondary small" type="button">Log Out</button>
+    </nav>
+  </header>
 
-    <main class="admin-main">
-      <!-- Controls -->
-      <section class="panel admin-controls-panel">
-        <div class="admin-controls-header">
-          <div>
-            <p class="eyebrow">Dashboard</p>
-            <h2>Submissions</h2>
-          </div>
-          <div class="admin-actions">
-            <button id="loadSubmissions" class="primary" type="button">Refresh</button>
-            <button id="downloadCsv" class="secondary" type="button">Export CSV</button>
-          </div>
+  <main class="admin-main">
+    <section class="panel admin-controls-panel">
+      <div class="admin-controls-header">
+        <div>
+          <p class="eyebrow">Dashboard</p>
+          <h2>Submissions</h2>
         </div>
-
-        <!-- Search & filter -->
-        <div class="admin-filter-row">
-          <label class="admin-search-label">
-            <span>Search by student ID or name</span>
-            <input id="searchInput" type="search" placeholder="e.g. PS-2025-001" />
-          </label>
-          <button id="resetSubmission" class="danger small" type="button" title="Reset a student's submission lock">Reset Student Lock</button>
-        </div>
-
-        <!-- Stats bar -->
-        <div id="statsBar" class="stats-bar" hidden>
-          <div class="stat-chip"><strong id="statTotal">0</strong><small>submissions</small></div>
-          <div class="stat-chip"><strong id="statToday">0</strong><small>today</small></div>
-        </div>
-      </section>
-
-      <!-- Reset modal -->
-      <div id="resetModal" class="modal-overlay" hidden>
-        <div class="modal-card">
-          <h3>Reset Student Lock</h3>
-          <p>Enter the student ID to allow them to re-submit. This will delete their existing submission record.</p>
-          <label>
-            Student ID
-            <input id="resetIndexInput" placeholder="PS-2025-001" />
-          </label>
-          <div class="modal-actions">
-            <button id="cancelReset" class="secondary" type="button">Cancel</button>
-            <button id="confirmReset" class="danger" type="button">Reset</button>
-          </div>
-          <p id="resetMsg" class="status"></p>
+        <div class="admin-actions">
+          <button id="loadSubmissions" class="primary" type="button">Refresh</button>
+          <button id="downloadCsv" class="secondary" type="button">Export CSV</button>
         </div>
       </div>
 
-      <section id="submissions" class="submissions"></section>
-    </main>
+      <div class="admin-filter-row">
+        <label class="admin-search-label">
+          <span>Search by student ID or name</span>
+          <input id="searchInput" type="search" placeholder="e.g. PS-2025-001" />
+        </label>
+        <button id="resetSubmission" class="danger small" type="button" title="Reset a student's submission lock">Reset Student Lock</button>
+      </div>
 
-    <script src="/admin.js"></script>
-  </body>
+      <div id="statsBar" class="stats-bar" hidden>
+        <div class="stat-chip"><strong id="statTotal">0</strong><small>submissions</small></div>
+        <div class="stat-chip"><strong id="statToday">0</strong><small>today</small></div>
+      </div>
+    </section>
+
+    <div id="resetModal" class="modal-overlay" hidden>
+      <div class="modal-card">
+        <h3>Reset Student Lock</h3>
+        <p>Enter the student ID to allow them to re-submit. This will delete their existing submission record.</p>
+        <label>
+          Student ID
+          <input id="resetIndexInput" placeholder="PS-2025-001" />
+        </label>
+        <div class="modal-actions">
+          <button id="cancelReset" class="secondary" type="button">Cancel</button>
+          <button id="confirmReset" class="danger" type="button">Reset</button>
+        </div>
+        <p id="resetMsg" class="status"></p>
+      </div>
+    </div>
+
+    <section id="submissions" class="submissions"></section>
+  </main>
+
+  <script src="/admin.js"></script>
+</body>
 </html>
