@@ -101,15 +101,16 @@ function renderSubmissions(subs) {
   }).join("");
 }
 
-window.downloadTxt = async function(id) {
-  const token = getAdminToken();
-  window.location.href = `/api/submissions/${id}/txt?token=${encodeURIComponent(token)}`;
+// Individual TXT
+window.downloadTxt = function(id) {
+  const token = encodeURIComponent(getAdminToken());
+  window.location.href = `/api/submissions/${id}/txt?token=${token}`;
 };
 
 // Download All as ZIP
 document.getElementById("downloadAllTxt").addEventListener("click", () => {
-  const token = getAdminToken();
-  window.location.href = `/api/submissions/all.zip?token=${encodeURIComponent(token)}`;
+  const token = encodeURIComponent(getAdminToken());
+  window.location.href = `/api/submissions/all.zip?token=${token}`;
 });
 
 // Reset, Logout, etc. (same as previous version)

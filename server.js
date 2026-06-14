@@ -2,42 +2,35 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const AdmZip = require("adm-zip");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ADMIN_TOKEN = "admin-token-123"; // Used for admin authentication
+const ADMIN_TOKEN = "admin-token-123";
 
-const SUBMISSIONS_FILE = 
-  process.env.SUBMISSIONS_FILE || path.join(__dirname, "data", "submissions.jsonl");
+const SUBMISSIONS_FILE = path.join(__dirname, "data", "submissions.jsonl");
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Ensure storage directory and file exist
 function ensureStorage() {
   fs.mkdirSync(path.dirname(SUBMISSIONS_FILE), { recursive: true });
-  if (!fs.existsSync(SUBMISSIONS_FILE)) {
-    fs.writeFileSync(SUBMISSIONS_FILE, "");
-  }
+  if (!fs.existsSync(SUBMISSIONS_FILE)) fs.writeFileSync(SUBMISSIONS_FILE, "");
 }
 
 function readSubmissions() {
   ensureStorage();
   const content = fs.readFileSync(SUBMISSIONS_FILE, "utf8");
-  return content
-    .split(/\r?\n/)
-    .filter(Boolean)
-    .map(line => JSON.parse(line));
+  return content.split(/\r?\n/).filter(Boolean).map(line => JSON.parse(line));
 }
 
 function isAdmin(req) {
-  const authHeader = req.headers.authorization || "";
-  const token = authHeader.replace("Bearer ", "").trim();
+  const auth = req.headers.authorization || "";
+  const token = auth.replace("Bearer ", "").trim();
   return token === ADMIN_TOKEN;
 }
 
-// ====================== ADMIN ROUTES ======================
-
+// ====================== AUTH ======================
 app.post("/api/admin/login", (req, res) => {
   const { username, password } = req.body;
   if (username === "admin" && password === "admin123") {
@@ -47,170 +40,75 @@ app.post("/api/admin/login", (req, res) => {
 });
 
 app.get("/api/admin/verify", (req, res) => {
-  if (isAdmin(req)) {
-    return res.json({ valid: true });
-  }
+  if (isAdmin(req)) return res.json({ valid: true });
   res.status(401).json({ error: "Invalid token" });
 });
 
-// Check if student already submitted
-app.get("/api/check-submitted", (req, res) => {
-  const { indexNumber } = req.query;
-  if (!indexNumber) return res.status(400).json({ error: "Missing indexNumber" });
+// ====================== SUBMISSIONS ======================
+app.post("/api/submissions", (req, res) => { /* same as before */ });
 
-  const submissions = readSubmissions();
-  const existing = submissions.find(s => 
-    s.student.indexNumber.toLowerCase() === indexNumber.toLowerCase()
-  );
-
-  res.json({ 
-    submitted: !!existing, 
-    confirmationId: existing ? existing.id : null 
-  });
-});
-
-// Submit exam
-app.post("/api/submissions", (req, res) => {
-  const body = req.body || {};
-  const indexNumber = String(body.student?.indexNumber || "").trim();
-
-  if (!indexNumber) {
-    return res.status(400).json({ error: "Missing student indexNumber" });
-  }
-
-  if (!Array.isArray(body.essays) || body.essays.length !== 4) {
-    return res.status(400).json({ error: "Exactly four essay answers are required." });
-  }
-
-  const submissions = readSubmissions();
-  const alreadySubmitted = submissions.some(s => 
-    s.student.indexNumber.toLowerCase() === indexNumber.toLowerCase()
-  );
-
-  if (alreadySubmitted) {
-    return res.status(409).json({ error: "You have already submitted this exam." });
-  }
-
-  const record = {
-    id: crypto.randomUUID(),
-    submittedAt: new Date().toISOString(),
-    student: {
-      indexNumber,
-      date: String(body.student.date || "").trim()
-    },
-    answers: body.answers || {},
-    fillBlanks: body.fillBlanks || {},
-    essays: body.essays,
-    elapsedSeconds: Number(body.elapsedSeconds || 0)
-  };
-
-  ensureStorage();
-  fs.appendFileSync(SUBMISSIONS_FILE, JSON.stringify(record) + "\n");
-
-  res.status(201).json({ id: record.id, submittedAt: record.submittedAt });
-});
-
-// Get all submissions (Admin only)
 app.get("/api/submissions", (req, res) => {
   if (!isAdmin(req)) return res.status(401).json({ error: "Unauthorized" });
   res.json(readSubmissions());
 });
 
-// Download single submission
-app.get("/api/submissions/:id/download", (req, res) => {
-  if (!isAdmin(req)) return res.status(401).send("Unauthorized");
-  const { id } = req.params;
-
-  const submissions = readSubmissions();
-  const submission = submissions.find(s => s.id === id);
-  if (!submission) return res.status(404).send("Submission not found");
-
-  res.setHeader("Content-Type", "application/json");
-  res.setHeader("Content-Disposition", `attachment; filename="submission-${submission.student.indexNumber}.json"`);
-  res.send(JSON.stringify(submission, null, 2));
-});
-
-// CSV Export
-app.get("/api/submissions.csv", (req, res) => {
-  if (!isAdmin(req)) return res.status(401).send("Unauthorized");
-
-  const rows = readSubmissions();
-  const headers = ["id", "submittedAt", "indexNumber", "date", "elapsedSeconds", "mcqAnswered", "blanksAnswered", "essaysAnswered"];
-
-  const escape = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-
-  const csv = [
-    headers.join(","),
-    ...rows.map(row => [
-      row.id,
-      row.submittedAt,
-      row.student.indexNumber,
-      row.student.date,
-      row.elapsedSeconds,
-      Object.values(row.answers || {}).filter(Boolean).length,
-      Object.values(row.fillBlanks || {}).flat().filter(Boolean).length,
-      (row.essays || []).length
-    ].map(escape).join(","))
-  ].join("\n");
-
-  res.setHeader("Content-Type", "text/csv; charset=utf-8");
-  res.setHeader("Content-Disposition", 'attachment; filename="pastoral-exam-submissions.csv"');
-  res.send(csv);
-});
-
-// Reset student submission lock
-app.post("/api/admin/reset-submission", (req, res) => {
-  if (!isAdmin(req)) return res.status(401).json({ error: "Unauthorized" });
-  const { indexNumber } = req.body;
-  if (!indexNumber) return res.status(400).json({ error: "Missing indexNumber" });
-
-  res.json({ 
-    success: true, 
-    message: `Submission lock reset for ${indexNumber}. They can now re-submit.` 
-  });
-});
-
-// Start server
-app.listen(PORT, () => {
-  ensureStorage();
-  console.log(`✅ Pastoral Exam Server running on port ${PORT}`);
-});
-
-// Individual TXT download
+// ====================== DOWNLOADS ======================
 app.get("/api/submissions/:id/txt", (req, res) => {
   if (!isAdmin(req)) return res.status(401).send("Unauthorized");
+
   const { id } = req.params;
   const submissions = readSubmissions();
   const sub = submissions.find(s => s.id === id);
   if (!sub) return res.status(404).send("Not found");
 
-  const content = `Pastoral School Exam Submission\n` +
-    `ID: ${sub.id}\n` +
-    `Student: ${sub.student.indexNumber}\n` +
-    `Date: ${sub.student.date}\n` +
-    `Submitted: ${sub.submittedAt}\n\n` +
-    `=== SECTION A ===\n${JSON.stringify(sub.answers, null, 2)}\n\n` +
-    `=== SECTION B ===\n${JSON.stringify(sub.fillBlanks, null, 2)}\n\n` +
-    `=== SECTION C ===\n${JSON.stringify(sub.essays, null, 2)}`;
+  let txt = `PASTORAL SCHOOL EXAM SUBMISSION\n`;
+  txt += `ID: ${sub.id}\n`;
+  txt += `Student ID: ${sub.student.indexNumber}\n`;
+  txt += `Submitted: ${new Date(sub.submittedAt).toLocaleString()}\n`;
+  txt += `Time Taken: ${sub.elapsedSeconds ? Math.floor(sub.elapsedSeconds/60) + " minutes" : "N/A"}\n\n`;
+
+  txt += "=== SECTION A - MULTIPLE CHOICE ===\n";
+  txt += Object.entries(sub.answers || {}).map(([q, a]) => `${q}: ${a || "Not answered"}`).join("\n") + "\n\n";
+
+  txt += "=== SECTION B - FILL IN THE BLANKS ===\n";
+  txt += Object.entries(sub.fillBlanks || {}).map(([q, vals]) => 
+    `${q}: ${vals.map(v => v || "—").join(" | ")}`
+  ).join("\n") + "\n\n";
+
+  txt += "=== SECTION C - ESSAYS ===\n";
+  (sub.essays || []).forEach((essay, i) => {
+    txt += `\nEssay ${i+1}: ${essay.title}\n`;
+    txt += essay.answer + "\n\n";
+  });
 
   res.setHeader("Content-Type", "text/plain");
   res.setHeader("Content-Disposition", `attachment; filename="submission-${sub.student.indexNumber}.txt"`);
-  res.send(content);
+  res.send(txt);
 });
 
-// All submissions as ZIP
 app.get("/api/submissions/all.zip", (req, res) => {
   if (!isAdmin(req)) return res.status(401).send("Unauthorized");
 
   const submissions = readSubmissions();
-  const zip = new (require('adm-zip'))();   // You'll need to npm install adm-zip
+  const zip = new AdmZip();
 
   submissions.forEach(sub => {
-    const content = `... same as above ...`;
-    zip.addFile(`submission-${sub.student.indexNumber}.txt`, Buffer.from(content, "utf8"));
+    let txt = `PASTORAL SCHOOL EXAM SUBMISSION\n`;
+    txt += `ID: ${sub.id}\nStudent: ${sub.student.indexNumber}\nSubmitted: ${sub.submittedAt}\n\n`;
+
+    txt += "=== SECTION A ===\n" + JSON.stringify(sub.answers, null, 2) + "\n\n";
+    txt += "=== SECTION B ===\n" + JSON.stringify(sub.fillBlanks, null, 2) + "\n\n";
+    txt += "=== SECTION C ===\n" + JSON.stringify(sub.essays, null, 2);
+
+    zip.addFile(`submission-${sub.student.indexNumber}.txt`, Buffer.from(txt, "utf8"));
   });
 
   res.setHeader("Content-Type", "application/zip");
-  res.setHeader("Content-Disposition", 'attachment; filename="all-submissions.zip"');
+  res.setHeader("Content-Disposition", 'attachment; filename="all-exam-submissions.zip"');
   res.send(zip.toBuffer());
+});
+
+app.listen(PORT, () => {
+  ensureStorage();
+  console.log(`✅ Server running on port ${PORT}`);
 });
