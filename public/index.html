@@ -1,258 +1,327 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pastoral School Examination</title>
-  <link rel="stylesheet" href="/styles.css" />
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pastoral School Examination - Those Who Are Proud</title>
+    <link rel="stylesheet" href="/styles.css" />
 
-<body>
+    <style>
+      /* safety fallback if styles.css partially fails */
+      .hidden { display: none !important; }
+    </style>
+  </head>
 
-<!-- ================= LOGIN ================= -->
-<section id="loginView">
-  <h1>Exam Login</h1>
+  <body>
 
-  <form id="loginForm">
-    <label>
-      Student ID
-      <input id="loginIndexNumber" required />
-    </label>
+    <!-- ================= LOGIN VIEW ================= -->
+    <section id="loginView" class="login-view">
+      <div class="login-bg-grid" aria-hidden="true"></div>
 
-    <button type="submit">Continue to Exam</button>
-  </form>
-</section>
+      <div class="login-card">
+        <p class="brand-mark">Pastoral School</p>
+        <h1>Sign in to start your exam</h1>
 
-<!-- ================= EXAM ================= -->
-<section id="examView" hidden>
+        <p class="login-copy">
+          Enter your student ID to unlock the assessment for
+          <strong>Those Who Are Proud</strong>.
+        </p>
 
-  <header>
-    <h2>Those Who Are Proud</h2>
-    <div>Time Left: <span id="timer">02:30:00</span></div>
-  </header>
+        <form id="loginForm" class="login-form">
+          <label>
+            Student ID
+            <input id="loginIndexNumber" autocomplete="username" required />
+          </label>
 
-  <form id="examForm">
+          <button class="primary wide" type="submit">Continue to Exam</button>
+        </form>
 
-    <label>
-      Full Name
-      <input name="fullName" />
-    </label>
+        <div class="login-meta">
+          <span>2h 30m</span>
+          <span>3 sections</span>
+          <span>100 marks</span>
+        </div>
 
-    <label>
-      Index Number
-      <input name="indexNumber" readonly />
-    </label>
+        <p class="login-note">Your timer starts after this step.</p>
+      </div>
+    </section>
 
-    <label>
-      Date
-      <input name="date" type="date" />
-    </label>
+    <!-- ================= EXAM VIEW ================= -->
+    <div id="examView" class="app-view hidden">
 
-    <hr />
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Pastoral School Examination</p>
+          <h1>Those Who Are Proud</h1>
+        </div>
 
-    <!-- MCQ -->
-    <div>
-      <p>Q1</p>
-      <label><input type="radio" name="q1" value="A" data-mcq> A</label>
-      <label><input type="radio" name="q1" value="B" data-mcq> B</label>
+        <div class="timer" aria-live="polite">
+          <span>Time Left</span>
+          <strong id="timer">02:30:00</strong>
+        </div>
+      </header>
+
+      <main class="exam-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="course-rail" aria-label="Exam navigation">
+          <div class="course-card">
+            <p class="eyebrow">Course Assessment</p>
+            <h2>Those Who Are Proud</h2>
+            <p>Complete every required section before submitting.</p>
+
+            <div class="rail-progress"></div>
+          </div>
+
+          <nav class="tabs">
+            <button type="button" class="tab active" data-target="sectionA">Section A</button>
+            <button type="button" class="tab" data-target="sectionB">Section B</button>
+            <button type="button" class="tab" data-target="sectionC">Section C</button>
+            <button type="button" class="tab" data-target="review">Review</button>
+          </nav>
+        </aside>
+
+        <!-- FORM -->
+        <form id="examForm" class="exam-shell">
+
+          <!-- STUDENT INFO -->
+          <section class="panel student-panel">
+            <div>
+              <p class="eyebrow">Student Workspace</p>
+              <h2>Exam Details</h2>
+            </div>
+
+            <label>
+              Full Name
+              <input name="fullName" autocomplete="name" required />
+            </label>
+
+            <label>
+              Index Number
+              <input name="indexNumber" readonly required />
+            </label>
+
+            <label>
+              Date
+              <input name="date" type="date" required />
+            </label>
+          </section>
+
+          <!-- SECTION A -->
+          <section id="sectionA" class="section active">
+            <div class="section-heading">
+              <h2>Section A: Multiple Choice</h2>
+            </div>
+
+            <div class="question">
+              <p>1. Example Question</p>
+              <label><input type="radio" name="q1" value="A" data-mcq /> A</label>
+              <label><input type="radio" name="q1" value="B" data-mcq /> B</label>
+            </div>
+          </section>
+
+          <!-- SECTION B -->
+          <section id="sectionB" class="section">
+            <div class="section-heading">
+              <h2>Section B: Fill in Blanks</h2>
+            </div>
+
+            <input name="blank1" data-blank placeholder="Answer here" />
+          </section>
+
+          <!-- SECTION C -->
+          <section id="sectionC" class="section">
+            <div class="section-heading">
+              <h2>Section C: Essays</h2>
+            </div>
+
+            <textarea data-essay placeholder="Essay 1"></textarea>
+            <textarea data-essay placeholder="Essay 2"></textarea>
+          </section>
+
+          <!-- REVIEW -->
+          <section id="review" class="section">
+            <h2>Review & Submit</h2>
+
+            <button type="submit" class="primary">Submit Exam</button>
+          </section>
+
+        </form>
+      </main>
     </div>
 
-    <!-- BLANK -->
-    <div>
-      <p>Fill in blank</p>
-      <input name="blank1" data-blank />
-    </div>
+    <!-- ================= SCRIPT ================= -->
+    <script>
+      const STORAGE_KEY = "pastoral_exam_state";
 
-    <!-- ESSAY -->
-    <div>
-      <textarea data-essay placeholder="Essay 1"></textarea>
-      <textarea data-essay placeholder="Essay 2"></textarea>
-    </div>
+      let remainingSeconds = 9000;
+      let timerInterval;
 
-    <button type="submit">Submit Exam</button>
+      // ================= LOGIN =================
+      document.getElementById("loginForm").addEventListener("submit", (e) => {
+        e.preventDefault();
 
-  </form>
-</section>
+        const id = document.getElementById("loginIndexNumber").value.trim();
+        if (!id) return;
 
-<!-- ================= SCRIPT ================= -->
-<script>
-const STORAGE_KEY = "exam_state_clean";
+        const state = loadState() || {};
 
-let remainingSeconds = 9000;
-let timerInterval;
+        state.student = { indexNumber: id };
+        state.remainingSeconds = state.remainingSeconds || remainingSeconds;
 
-/* ================= LOGIN ================= */
-document.getElementById("loginForm").addEventListener("submit", (e) => {
-  e.preventDefault();
+        saveState(state);
+        startExam(id);
+      });
 
-  const id = document.getElementById("loginIndexNumber").value.trim();
-  if (!id) return alert("Enter Student ID");
+      // ================= START EXAM =================
+      function startExam(idFromLogin = null) {
+        document.getElementById("loginView").classList.add("hidden");
+        document.getElementById("examView").classList.remove("hidden");
 
-  const state = loadState() || {};
+        const state = loadState();
 
-  state.student = { indexNumber: id };
-  state.remainingSeconds = remainingSeconds;
+        const id = idFromLogin || state?.student?.indexNumber;
 
-  saveToStorage(state);
+        if (id) {
+          document.querySelector('[name="indexNumber"]').value = id;
+        }
 
-  startExam(id);
-});
+        remainingSeconds = state?.remainingSeconds || remainingSeconds;
 
-/* ================= START EXAM ================= */
-function startExam(idFromLogin = null) {
+        restoreState();
+        startTimer();
+      }
 
-  const loginView = document.getElementById("loginView");
-  const examView = document.getElementById("examView");
+      // ================= TIMER =================
+      function startTimer() {
+        clearInterval(timerInterval);
 
-  loginView.style.display = "none";
-  examView.hidden = false;
+        function render() {
+          const h = String(Math.floor(remainingSeconds / 3600)).padStart(2, "0");
+          const m = String(Math.floor((remainingSeconds % 3600) / 60)).padStart(2, "0");
+          const s = String(remainingSeconds % 60).padStart(2, "0");
 
-  const state = loadState();
+          document.getElementById("timer").textContent = `${h}:${m}:${s}`;
+        }
 
-  const id = idFromLogin || state?.student?.indexNumber;
+        render();
 
-  if (id) {
-    document.querySelector('[name="indexNumber"]').value = id;
-  }
+        timerInterval = setInterval(() => {
+          remainingSeconds--;
 
-  remainingSeconds = state?.remainingSeconds || 9000;
+          saveProgress();
 
-  restoreState();
+          if (remainingSeconds <= 0) {
+            clearInterval(timerInterval);
+            alert("Time is up!");
+            document.getElementById("examForm").submit();
+            return;
+          }
 
-  startTimer();
-}
+          render();
+        }, 1000);
+      }
 
-/* ================= TIMER ================= */
-function startTimer() {
-  clearInterval(timerInterval);
+      // ================= SAVE =================
+      function saveProgress() {
+        const state = loadState() || {};
 
-  function render() {
-    const h = String(Math.floor(remainingSeconds / 3600)).padStart(2, "0");
-    const m = String(Math.floor((remainingSeconds % 3600) / 60)).padStart(2, "0");
-    const s = String(remainingSeconds % 60).padStart(2, "0");
+        state.student = {
+          fullName: document.querySelector('[name="fullName"]').value,
+          indexNumber: document.querySelector('[name="indexNumber"]').value,
+          date: document.querySelector('[name="date"]').value
+        };
 
-    document.getElementById("timer").textContent = `${h}:${m}:${s}`;
-  }
+        state.answers = collectMCQ();
+        state.blanks = collectBlanks();
+        state.essays = collectEssays();
+        state.remainingSeconds = remainingSeconds;
 
-  render();
+        saveState(state);
+      }
 
-  timerInterval = setInterval(() => {
-    remainingSeconds--;
+      function saveState(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
 
-    saveProgress();
+      function loadState() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY));
+        } catch {
+          return null;
+        }
+      }
 
-    if (remainingSeconds <= 0) {
-      clearInterval(timerInterval);
-      alert("Time up!");
-      document.getElementById("examForm").submit();
-      return;
-    }
+      // ================= RESTORE =================
+      function restoreState() {
+        const state = loadState();
+        if (!state) return;
 
-    render();
-  }, 1000);
-}
+        if (state.student) {
+          document.querySelector('[name="fullName"]').value = state.student.fullName || "";
+          document.querySelector('[name="date"]').value = state.student.date || "";
+        }
 
-/* ================= SAVE ================= */
-function saveProgress() {
-  const state = loadState() || {};
+        restoreMCQ(state.answers || {});
+        restoreBlanks(state.blanks || {});
+        restoreEssays(state.essays || []);
+      }
 
-  state.student = {
-    fullName: document.querySelector('[name="fullName"]').value,
-    indexNumber: document.querySelector('[name="indexNumber"]').value,
-    date: document.querySelector('[name="date"]').value
-  };
+      // ================= COLLECT =================
+      function collectMCQ() {
+        const data = {};
+        document.querySelectorAll("[data-mcq]:checked").forEach(el => {
+          data[el.name] = el.value;
+        });
+        return data;
+      }
 
-  state.answers = collectMCQ();
-  state.blanks = collectBlanks();
-  state.essays = collectEssays();
-  state.remainingSeconds = remainingSeconds;
+      function collectBlanks() {
+        const data = {};
+        document.querySelectorAll("[data-blank]").forEach(el => {
+          data[el.name] = el.value;
+        });
+        return data;
+      }
 
-  saveToStorage(state);
-}
+      function collectEssays() {
+        return Array.from(document.querySelectorAll("[data-essay]")).map(el => el.value);
+      }
 
-function saveToStorage(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
+      // ================= RESTORE HELPERS =================
+      function restoreMCQ(data) {
+        Object.entries(data).forEach(([name, value]) => {
+          const el = document.querySelector(`[name="${name}"][value="${value}"]`);
+          if (el) el.checked = true;
+        });
+      }
 
-function loadState() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY));
-  } catch {
-    return null;
-  }
-}
+      function restoreBlanks(data) {
+        Object.entries(data).forEach(([name, value]) => {
+          const el = document.querySelector(`[name="${name}"]`);
+          if (el) el.value = value;
+        });
+      }
 
-/* ================= RESTORE ================= */
-function restoreState() {
-  const state = loadState();
-  if (!state) return;
+      function restoreEssays(data) {
+        document.querySelectorAll("[data-essay]").forEach((el, i) => {
+          el.value = data[i] || "";
+        });
+      }
 
-  if (state.student) {
-    document.querySelector('[name="fullName"]').value = state.student.fullName || "";
-    document.querySelector('[name="date"]').value = state.student.date || "";
-  }
+      // ================= AUTO SAVE =================
+      document.addEventListener("input", saveProgress);
+      document.addEventListener("change", saveProgress);
 
-  restoreMCQ(state.answers || {});
-  restoreBlanks(state.blanks || {});
-  restoreEssays(state.essays || []);
-}
+      // ================= AUTO RESUME =================
+      window.addEventListener("load", () => {
+        const state = loadState();
+        if (state?.student?.indexNumber) {
+          startExam();
+        }
+      });
 
-/* ================= COLLECT ================= */
-function collectMCQ() {
-  const data = {};
-  document.querySelectorAll("[data-mcq]:checked").forEach(el => {
-    data[el.name] = el.value;
-  });
-  return data;
-}
+    </script>
 
-function collectBlanks() {
-  const data = {};
-  document.querySelectorAll("[data-blank]").forEach(el => {
-    data[el.name] = el.value;
-  });
-  return data;
-}
-
-function collectEssays() {
-  return Array.from(document.querySelectorAll("[data-essay]"))
-    .map(el => el.value);
-}
-
-/* ================= RESTORE HELPERS ================= */
-function restoreMCQ(data) {
-  Object.entries(data).forEach(([name, value]) => {
-    const el = document.querySelector(`[name="${name}"][value="${value}"]`);
-    if (el) el.checked = true;
-  });
-}
-
-function restoreBlanks(data) {
-  Object.entries(data).forEach(([name, value]) => {
-    const el = document.querySelector(`[name="${name}"]`);
-    if (el) el.value = value;
-  });
-}
-
-function restoreEssays(data) {
-  document.querySelectorAll("[data-essay]").forEach((el, i) => {
-    el.value = data[i] || "";
-  });
-}
-
-/* ================= AUTO SAVE EVENTS ================= */
-document.addEventListener("input", saveProgress);
-document.addEventListener("change", saveProgress);
-
-/* ================= INIT ================= */
-window.addEventListener("load", () => {
-  const state = loadState();
-
-  if (state?.student?.indexNumber) {
-    startExam();
-  }
-});
-</script>
-
-</body>
+  </body>
 </html>
