@@ -303,6 +303,7 @@ const exam = {
 let startedAt = null;
 let timerHandle = null;
 const DRAFT_KEY = "pastoralSchoolThoseWhoAreProudDraft.v2";
+let isRestoringDraft = false;
 let isSubmitted = false;
 
 // ─── DOM refs ─────────────────────────────────────────────────────────────────
@@ -317,7 +318,9 @@ const essayList      = document.querySelector("#essayList");
 const form           = document.querySelector("#examForm");
 const statusMessage  = document.querySelector("#statusMessage");
 
-// Ensure submitted view is hidden on load
+document.querySelector('input[name="date"]').valueAsDate = new Date();
+
+// Force hide submitted view immediately
 submittedView.hidden = true;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -330,35 +333,136 @@ function formatTime(totalSeconds) {
   return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
 }
 
-// Render functions (same as before)
-function renderMcq() { /* ... your original renderMcq ... */ }
-function renderBlanks() { /* ... your original renderBlanks ... */ }
-function renderEssays() { /* ... your original renderEssays ... */ }
+// ─── Render ───────────────────────────────────────────────────────────────────
+function renderMcq() {
+  mcqList.innerHTML = exam.mcq.map((q, i) => `
+    <fieldset class="question-card">
+      <legend>${i + 1}. ${q.text}</legend>
+      ${q.options.map((opt, oi) => `
+        <label class="option">
+          <input type="radio" name="${q.id}" value="${optionLetter(oi)}" />
+          <span>${optionLetter(oi)}. ${opt}</span>
+        </label>`).join("")}
+    </fieldset>`).join("");
+}
 
-// Navigation, Essay controls, Payload, Draft, Timer, Summary (same as previous version)
-function setActiveSection(id, shouldSave = true) { /* ... */ }
-function getSelectedEssays() { /* ... */ }
-function updateEssayControls() { /* ... */ }
-function collectPayload() { /* ... */ }
-function saveDraft() { /* ... */ }
+function renderBlanks() {
+  blankList.innerHTML = exam.blanks.map((q, i) => `
+    <div class="question-card">
+      <p class="question-title">${i + 1}. ${q.text}</p>
+      <div class="blank-inputs">
+        ${Array.from({ length: q.blanks }, (_, bi) => {
+          const label = q.blanks === 1 ? "Answer" : `Blank ${bi + 1}`;
+          return `<label>${label}<input name="${q.id}_${bi + 1}" /></label>`;
+        }).join("")}
+      </div>
+    </div>`).join("");
+}
+
+function renderEssays() {
+  essayList.innerHTML = exam.essays.map((q, i) => `
+    <div class="question-card">
+      <label class="essay-toggle">
+        <input type="checkbox" class="essay-select" value="${q.id}" />
+        <span>Answer Question ${i + 1}: ${q.title}</span>
+      </label>
+      <p>${q.prompt.replace(/\n/g, "<br />")}</p>
+      <textarea name="${q.id}" disabled placeholder="Select this essay question to enable the text area."></textarea>
+    </div>`).join("");
+}
+
+// ─── Navigation & Controls ───────────────────────────────────────────────────
+function setActiveSection(id, shouldSave = true) {
+  document.querySelectorAll(".section").forEach(s => s.classList.toggle("active", s.id === id));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.target === id));
+  if (id === "review") updateSummary();
+  if (shouldSave) saveDraft();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => setActiveSection(tab.dataset.target)));
+
+document.addEventListener("click", e => {
+  const nextBtn = e.target.closest(".next-section-btn");
+  const prevBtn = e.target.closest(".prev-section-btn");
+  if (nextBtn) setActiveSection(nextBtn.dataset.next);
+  if (prevBtn) setActiveSection(prevBtn.dataset.prev);
+});
+
+function getSelectedEssays() {
+  return [...document.querySelectorAll(".essay-select:checked")].map(cb => cb.value);
+}
+
+function updateEssayControls() {
+  const selected = getSelectedEssays();
+  document.querySelectorAll(".essay-select").forEach(cb => {
+    const ta = document.querySelector(`textarea[name="${cb.value}"]`);
+    ta.disabled = !cb.checked;
+    if (!cb.checked) ta.value = "";
+    cb.disabled = !cb.checked && selected.length >= 4;
+  });
+  updateSummary();
+}
+
+// ─── Payload & Draft ─────────────────────────────────────────────────────────
+function collectPayload() {
+  const data = new FormData(form);
+  const answers = {};
+  exam.mcq.forEach(q => answers[q.id] = data.get(q.id) || "");
+
+  const fillBlanks = {};
+  exam.blanks.forEach(q => {
+    fillBlanks[q.id] = Array.from({ length: q.blanks }, (_, i) =>
+      String(data.get(`${q.id}_${i + 1}`) || "").trim()
+    );
+  });
+
+  const essays = getSelectedEssays().map(id => {
+    const q = exam.essays.find(item => item.id === id);
+    return { id, title: q.title, prompt: q.prompt, answer: String(data.get(id) || "").trim() };
+  });
+
+  return {
+    student: {
+      indexNumber: String(data.get("indexNumber") || "").trim(),
+      date: String(data.get("date") || "").trim()
+    },
+    answers,
+    fillBlanks,
+    essays,
+    elapsedSeconds: startedAt ? Math.floor((Date.now() - startedAt) / 1000) : 0
+  };
+}
+
+function saveDraft() {
+  if (isRestoringDraft || isSubmitted) return;
+  const payload = collectPayload();
+  const hasStarted = Boolean(payload.student.indexNumber || loginIndexNum.value.trim());
+  if (!hasStarted) return;
+
+  localStorage.setItem(DRAFT_KEY, JSON.stringify({
+    ...payload,
+    loginIndexNumber: loginIndexNum.value.trim(),
+    startedAt,
+    activeSection: document.querySelector(".section.active")?.id || "sectionA",
+    savedAt: new Date().toISOString()
+  }));
+}
 
 function restoreDraft() {
   const raw = localStorage.getItem(DRAFT_KEY);
   if (!raw) return false;
   let draft;
-  try { draft = JSON.parse(raw); } catch { 
-    localStorage.removeItem(DRAFT_KEY); 
-    return false; 
-  }
+  try { draft = JSON.parse(raw); } catch { localStorage.removeItem(DRAFT_KEY); return false; }
 
+  isRestoringDraft = true;
   const studentId = draft.student?.indexNumber || draft.loginIndexNumber || "";
-  if (!studentId) return false;
+  if (!studentId) { isRestoringDraft = false; return false; }
 
   loginIndexNum.value = studentId;
   form.elements.indexNumber.value = studentId;
   form.elements.date.value = draft.student?.date || form.elements.date.value;
 
-  // Restore answers...
   Object.entries(draft.answers || {}).forEach(([qId, val]) => {
     const radio = form.querySelector(`input[name="${qId}"][value="${val}"]`);
     if (radio) radio.checked = true;
@@ -380,28 +484,61 @@ function restoreDraft() {
 
   startedAt = Number(draft.startedAt) || null;
 
+  loginView.hidden = true;
+  examView.hidden = false;
+  submittedView.hidden = true;
+
+  if (!startedAt) startedAt = Date.now();
+  startTimer();
+
   updateEssayControls();
   setActiveSection(draft.activeSection || "sectionA", false);
   updateSummary();
 
-  loginView.hidden = true;
-  examView.hidden = false;
-  if (!startedAt) startedAt = Date.now();
-  startTimer();
-
+  isRestoringDraft = false;
   return true;
 }
 
-// Timer functions
-function startTimer() { /* ... */ }
-function tickTimer() { /* ... */ }
-function updateSummary() { /* ... */ }
+// ─── Timer ────────────────────────────────────────────────────────────────────
+function startTimer() {
+  if (timerHandle) clearInterval(timerHandle);
+  tickTimer();
+  timerHandle = setInterval(tickTimer, 1000);
+}
 
-// Login Handler
+function tickTimer() {
+  if (!startedAt) return;
+  const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+  const remaining = Math.max(0, exam.durationSeconds - elapsed);
+  document.querySelector("#timer").textContent = formatTime(remaining);
+  if (remaining === 0) {
+    statusMessage.textContent = "Time is up. Please submit your exam now.";
+    statusMessage.classList.add("error");
+    clearInterval(timerHandle);
+  }
+}
+
+// ─── Summary ──────────────────────────────────────────────────────────────────
+function updateSummary() {
+  const payload = collectPayload();
+  const mcqAnswered = Object.values(payload.answers).filter(Boolean).length;
+  const blankAnswered = Object.values(payload.fillBlanks).flat().filter(Boolean).length;
+  const essayCount = payload.essays.length;
+  const essayWords = payload.essays.reduce((sum, e) => sum + e.answer.split(/\s+/).filter(Boolean).length, 0, 0);
+
+  document.querySelector("#progressSummary").innerHTML = `
+    <div class="summary-item"><span>Section A</span><strong>${mcqAnswered}/20</strong><small>answered</small></div>
+    <div class="summary-item"><span>Section B</span><strong>${blankAnswered}/20</strong><small>completed</small></div>
+    <div class="summary-item"><span>Section C</span><strong>${essayCount}/4</strong><small>selected</small></div>
+    <div class="summary-item"><span>Essay Words</span><strong>${essayWords}</strong><small>written</small></div>
+  `;
+}
+
+// ─── Login ────────────────────────────────────────────────────────────────────
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const studentId = loginIndexNum.value.trim();
-  if (!studentId) return;
+  if (!studentId) { loginIndexNum.focus(); return; }
 
   const btn = loginForm.querySelector("button");
   btn.disabled = true;
@@ -410,25 +547,20 @@ loginForm.addEventListener("submit", async (event) => {
   try {
     const res = await fetch(`/api/check-submitted?indexNumber=${encodeURIComponent(studentId)}`);
     const data = await res.json();
-
     if (data.submitted) {
       loginView.hidden = true;
       submittedView.hidden = false;
-      document.querySelector("#submittedConfirmId").textContent = 
-        `Confirmation ID: ${data.confirmationId || "N/A"}`;
+      document.querySelector("#submittedConfirmId").textContent = `Confirmation ID: ${data.confirmationId || "N/A"}`;
       btn.disabled = false;
       btn.textContent = "Continue to Exam";
       return;
     }
-  } catch (e) {
-    console.warn("Submission check failed");
-  }
+  } catch (e) { console.warn("Check failed"); }
 
-  // Start fresh exam
   form.elements.indexNumber.value = studentId;
   loginView.hidden = true;
   examView.hidden = false;
-  submittedView.hidden = true;   // ← Explicitly hide
+  submittedView.hidden = true;
 
   if (!startedAt) startedAt = Date.now();
   startTimer();
@@ -438,30 +570,46 @@ loginForm.addEventListener("submit", async (event) => {
   btn.textContent = "Continue to Exam";
 });
 
-// Form events and Submit handler
-form.addEventListener("change", (e) => {
+// ─── Form Events ──────────────────────────────────────────────────────────────
+form.addEventListener("change", e => {
   if (e.target.classList.contains("essay-select")) updateEssayControls();
   updateSummary();
   saveDraft();
 });
-
 form.addEventListener("input", () => { updateSummary(); saveDraft(); });
 window.addEventListener("beforeunload", saveDraft);
 
+// ─── Submit ───────────────────────────────────────────────────────────────────
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  // ... validation ...
+  statusMessage.textContent = "";
+  statusMessage.classList.remove("error");
+
+  const payload = collectPayload();
+
+  if (payload.essays.length !== 4) {
+    statusMessage.textContent = "Please select exactly four essay questions.";
+    statusMessage.classList.add("error");
+    return;
+  }
+  if (payload.essays.some(e => !e.answer.trim())) {
+    statusMessage.textContent = "Please complete all selected essays.";
+    statusMessage.classList.add("error");
+    return;
+  }
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting…";
 
   try {
     const response = await fetch("/api/submissions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(collectPayload())
+      body: JSON.stringify(payload)
     });
-
     const result = await response.json();
-
-    if (!response.ok) throw new Error(result.error || "Submission failed");
+    if (!response.ok) throw new Error(result.error || "Submission failed.");
 
     isSubmitted = true;
     clearInterval(timerHandle);
@@ -474,10 +622,12 @@ form.addEventListener("submit", async (event) => {
   } catch (error) {
     statusMessage.textContent = error.message;
     statusMessage.classList.add("error");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Exam";
   }
 });
 
-// Init
+// ─── Init ─────────────────────────────────────────────────────────────────────
 renderMcq();
 renderBlanks();
 renderEssays();
@@ -485,8 +635,10 @@ updateEssayControls();
 updateSummary();
 document.querySelector("#timer").textContent = formatTime(exam.durationSeconds);
 
-// Only restore draft if it exists — do NOT show submitted view
+submittedView.hidden = true;
+
 if (!restoreDraft()) {
-  // Fresh load — make sure submitted is hidden
+  loginView.hidden = false;
+  examView.hidden = true;
   submittedView.hidden = true;
 }
