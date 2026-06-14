@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pastoral School Examination - Those Who Are Proud</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <section id="loginView" class="login-view">
+      <div class="login-bg-grid" aria-hidden="true"></div>
+      <div class="login-card">
+        <p class="brand-mark">Pastoral School</p>
+        <h1>Sign in to start your exam</h1>
+        <p class="login-copy">Enter your student ID to unlock the assessment for <strong>Those Who Are Proud</strong>.</p>
+        <form id="loginForm" class="login-form">
+          <label>
+            Student ID
+            <input id="loginIndexNumber" autocomplete="username" required />
+          </label>
+          <button class="primary wide" type="submit">Continue to Exam</button>
+        </form>
+        <div class="login-meta" aria-label="Exam details">
+          <span>2h 30m</span>
+          <span>3 sections</span>
+          <span>100 marks</span>
+        </div>
+        <p class="login-note">Your timer starts after this step.</p>
+      </div>
+    </section>
+
+    <div id="examView" class="app-view" hidden>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Pastoral School Examination</p>
+        <h1>Those Who Are Proud</h1>
+      </div>
+      <div class="timer" aria-live="polite">
+        <span>Time Left</span>
+        <strong id="timer">02:30:00</strong>
+      </div>
+    </header>
+
+    <main class="exam-layout">
+      <aside class="course-rail" aria-label="Exam navigation">
+        <div class="course-card">
+          <p class="eyebrow">Course Assessment</p>
+          <h2>Those Who Are Proud</h2>
+          <p>Complete every required section before submitting.</p>
+          <div class="rail-progress" aria-hidden="true">
+            <span></span>
+          </div>
+        </div>
+        <nav class="tabs" aria-label="Exam sections">
+          <button type="button" class="tab active" data-target="sectionA">
+            <span>Section A</span>
+            <small>Multiple choice</small>
+          </button>
+          <button type="button" class="tab" data-target="sectionB">
+            <span>Section B</span>
+            <small>Fill in blanks</small>
+          </button>
+          <button type="button" class="tab" data-target="sectionC">
+            <span>Section C</span>
+            <small>Essays</small>
+          </button>
+          <button type="button" class="tab" data-target="review">
+            <span>Review</span>
+            <small>Submit exam</small>
+          </button>
+        </nav>
+      </aside>
+
+      <form id="examForm" class="exam-shell">
+        <section class="panel student-panel">
+          <div>
+            <p class="eyebrow">Student Workspace</p>
+            <h2>Exam Details</h2>
+            <p>Duration: 2 hours, 30 minutes. Answer all of Sections A and B, then answer any four questions in Section C.</p>
+          </div>
+          <label>
+            Full Name
+            <input name="fullName" autocomplete="name" required />
+          </label>
+          <label>
+            Index Number
+            <input name="indexNumber" readonly required />
+          </label>
+          <label>
+            Date
+            <input name="date" type="date" required />
+          </label>
+        </section>
+
+        <section id="sectionA" class="section active">
+          <div class="section-heading">
+            <h2>Section A: Multiple Choice Questions</h2>
+            <p>20 questions | 1/2 mark each | Total: 10 marks</p>
+          </div>
+          <div id="mcqList" class="question-list"></div>
+        </section>
+
+        <section id="sectionB" class="section">
+          <div class="section-heading">
+            <h2>Section B: Fill-In-The-Blank Questions</h2>
+            <p>20 blank spaces | 1/2 mark each | Total: 10 marks</p>
+          </div>
+          <div id="blankList" class="question-list"></div>
+        </section>
+
+        <section id="sectionC" class="section">
+          <div class="section-heading">
+            <h2>Section C: Essay Questions</h2>
+            <p>Total: 80 marks. Answer any four questions. Each question carries 20 marks.</p>
+          </div>
+          <div id="essayList" class="question-list"></div>
+        </section>
+
+        <section id="review" class="section">
+          <div class="section-heading">
+            <h2>Review and Submit</h2>
+            <p>Check your progress before submitting. You will receive a confirmation ID after a successful submission.</p>
+          </div>
+          <div id="progressSummary" class="summary-grid"></div>
+          <div class="actions">
+            <button type="button" id="printBtn" class="secondary">Print Answers</button>
+            <button type="submit" class="primary">Submit Exam</button>
+          </div>
+          <p id="statusMessage" class="status" role="status"></p>
+        </section>
+      </form>
+    </main>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

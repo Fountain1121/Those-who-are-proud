@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: pastoral-exam-site
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: ADMIN_PIN
+        generateValue: true
+      - key: SUBMISSIONS_FILE
+        value: /var/data/submissions.jsonl
+    disk:
+      name: exam-submissions
+      mountPath: /var/data
+      sizeGB: 1

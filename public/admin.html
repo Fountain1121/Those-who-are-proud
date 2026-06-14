@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exam Admin</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Pastoral School Examination</p>
+        <h1>Submission Admin</h1>
+      </div>
+      <a class="admin-link" href="/">Exam</a>
+    </header>
+    <main class="admin-main">
+      <section class="panel">
+        <h2>View Submissions</h2>
+        <div class="admin-controls">
+          <label>
+            Admin PIN
+            <input id="pin" type="password" />
+          </label>
+          <button id="loadSubmissions" class="primary" type="button">Load</button>
+          <button id="downloadCsv" class="secondary" type="button">Download CSV</button>
+        </div>
+      </section>
+      <section id="submissions" class="submissions"></section>
+    </main>
+    <script src="/admin.js"></script>
+  </body>
+</html>
