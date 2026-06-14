@@ -8,162 +8,117 @@
   </head>
 
   <body>
+
     <!-- ================= LOGIN VIEW ================= -->
     <section id="loginView" class="login-view">
-      <div class="login-bg-grid" aria-hidden="true"></div>
-
       <div class="login-card">
-        <p class="brand-mark">Pastoral School</p>
         <h1>Sign in to start your exam</h1>
 
-        <p class="login-copy">
-          Enter your student ID to unlock the assessment for
-          <strong>Those Who Are Proud</strong>.
-        </p>
-
-        <form id="loginForm" class="login-form">
+        <form id="loginForm">
           <label>
             Student ID
-            <input id="loginIndexNumber" autocomplete="username" required />
+            <input id="loginIndexNumber" required />
           </label>
 
-          <button class="primary wide" type="submit">
+          <button type="submit" class="primary wide">
             Continue to Exam
           </button>
         </form>
-
-        <div class="login-meta">
-          <span>2h 30m</span>
-          <span>3 sections</span>
-          <span>100 marks</span>
-        </div>
-
-        <p class="login-note">Your timer starts after this step.</p>
       </div>
     </section>
 
     <!-- ================= EXAM VIEW ================= -->
-    <div id="examView" class="app-view" hidden>
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">Pastoral School Examination</p>
-          <h1>Those Who Are Proud</h1>
-        </div>
+    <div id="examView" hidden>
 
-        <div class="timer" aria-live="polite">
-          <span>Time Left</span>
+      <header class="topbar">
+        <h1>Those Who Are Proud</h1>
+
+        <div>
+          Time Left:
           <strong id="timer">02:30:00</strong>
         </div>
       </header>
 
-      <main class="exam-layout">
-        <!-- SIDEBAR -->
-        <aside class="course-rail">
-          <div class="course-card">
-            <p class="eyebrow">Course Assessment</p>
-            <h2>Those Who Are Proud</h2>
-            <p>Complete all sections before submitting.</p>
-          </div>
+      <form id="examForm">
 
-          <nav class="tabs">
-            <button type="button" class="tab active" data-target="sectionA">Section A</button>
-            <button type="button" class="tab" data-target="sectionB">Section B</button>
-            <button type="button" class="tab" data-target="sectionC">Section C</button>
-            <button type="button" class="tab" data-target="review">Review</button>
-          </nav>
-        </aside>
+        <label>
+          Full Name
+          <input name="fullName" required />
+        </label>
 
-        <!-- FORM -->
-        <form id="examForm" class="exam-shell">
+        <label>
+          Index Number
+          <input name="indexNumber" readonly required />
+        </label>
 
-          <!-- STUDENT INFO -->
-          <section class="panel student-panel">
-            <h2>Exam Details</h2>
+        <label>
+          Date
+          <input name="date" type="date" required />
+        </label>
 
-            <label>
-              Full Name
-              <input name="fullName" required />
-            </label>
+        <hr />
 
-            <label>
-              Index Number
-              <input name="indexNumber" readonly required />
-            </label>
+        <!-- MCQ -->
+        <section>
+          <h2>Section A</h2>
 
-            <label>
-              Date
-              <input name="date" type="date" required />
-            </label>
-          </section>
+          <label>
+            Q1
+            <input type="radio" name="q1" value="A" data-mcq /> A
+            <input type="radio" name="q1" value="B" data-mcq /> B
+          </label>
+        </section>
 
-          <!-- SECTION A -->
-          <section id="sectionA" class="section active">
-            <h2>Section A: Multiple Choice</h2>
+        <!-- BLANKS -->
+        <section>
+          <h2>Section B</h2>
 
-            <div class="question">
-              <p>1. Example MCQ Question</p>
-              <label><input type="radio" name="q1" value="A" data-mcq /> A</label>
-              <label><input type="radio" name="q1" value="B" data-mcq /> B</label>
-              <label><input type="radio" name="q1" value="C" data-mcq /> C</label>
-            </div>
-          </section>
+          <input name="blank1" data-blank placeholder="Answer blank 1" />
+        </section>
 
-          <!-- SECTION B -->
-          <section id="sectionB" class="section">
-            <h2>Section B: Fill in Blanks</h2>
+        <!-- ESSAY -->
+        <section>
+          <h2>Section C</h2>
 
-            <label>
-              1. Example blank question
-              <input name="blank1" data-blank />
-            </label>
-          </section>
+          <textarea data-essay placeholder="Essay 1"></textarea>
+          <textarea data-essay placeholder="Essay 2"></textarea>
+        </section>
 
-          <!-- SECTION C -->
-          <section id="sectionC" class="section">
-            <h2>Section C: Essays</h2>
+        <button type="submit">Submit Exam</button>
 
-            <textarea data-essay placeholder="Essay Question 1"></textarea>
-            <textarea data-essay placeholder="Essay Question 2"></textarea>
-          </section>
-
-          <!-- REVIEW -->
-          <section id="review" class="section">
-            <h2>Review & Submit</h2>
-
-            <div id="progressSummary"></div>
-
-            <button type="submit" class="primary">Submit Exam</button>
-            <p id="statusMessage"></p>
-          </section>
-        </form>
-      </main>
+      </form>
     </div>
 
     <!-- ================= SCRIPT ================= -->
     <script>
       const STORAGE_KEY = "pastoral_exam_state";
 
-      let remainingSeconds = 9000; // default 2h 30m
+      let remainingSeconds = 9000;
       let timerInterval;
 
-      // ---------- LOGIN ----------
+      // ================= LOGIN =================
       document.getElementById("loginForm").addEventListener("submit", (e) => {
         e.preventDefault();
 
         const id = document.getElementById("loginIndexNumber").value.trim();
+        if (!id) return alert("Enter Student ID");
 
-        if (!id) return;
+        const state = loadState() || {};
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          student: { indexNumber: id },
-          remainingSeconds
-        }));
+        state.student = {
+          indexNumber: id
+        };
+
+        state.remainingSeconds = state.remainingSeconds || 9000;
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
         startExam();
       });
 
+      // ================= START EXAM =================
       function startExam() {
-        document.getElementById("loginView").hidden = true;
+        document.getElementById("loginView").style.display = "none";
         document.getElementById("examView").hidden = false;
 
         const saved = loadState();
@@ -173,15 +128,13 @@
             saved.student.indexNumber;
         }
 
-        if (saved?.remainingSeconds) {
-          remainingSeconds = saved.remainingSeconds;
-        }
+        remainingSeconds = saved?.remainingSeconds || 9000;
 
         startTimer(remainingSeconds);
         restoreState();
       }
 
-      // ---------- STATE ----------
+      // ================= STATE =================
       function saveState() {
         const data = {
           student: {
@@ -199,15 +152,23 @@
       }
 
       function loadState() {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY));
+        } catch {
+          return null;
+        }
       }
 
       function restoreState() {
         const data = loadState();
+        if (!data) return;
 
         if (data.student) {
-          document.querySelector('[name="fullName"]').value = data.student.fullName || "";
-          document.querySelector('[name="date"]').value = data.student.date || "";
+          document.querySelector('[name="fullName"]').value =
+            data.student.fullName || "";
+
+          document.querySelector('[name="date"]').value =
+            data.student.date || "";
         }
 
         restoreMCQ(data.answers || {});
@@ -215,7 +176,7 @@
         restoreEssays(data.essays || []);
       }
 
-      // ---------- TIMER ----------
+      // ================= TIMER =================
       function startTimer(sec) {
         clearInterval(timerInterval);
 
@@ -224,7 +185,8 @@
           const m = String(Math.floor((sec % 3600) / 60)).padStart(2, "0");
           const s = String(sec % 60).padStart(2, "0");
 
-          document.getElementById("timer").textContent = `${h}:${m}:${s}`;
+          document.getElementById("timer").textContent =
+            `${h}:${m}:${s}`;
         }
 
         render();
@@ -237,7 +199,7 @@
 
           if (sec <= 0) {
             clearInterval(timerInterval);
-            alert("Time is up!");
+            alert("Time up!");
             document.getElementById("examForm").submit();
             return;
           }
@@ -246,7 +208,7 @@
         }, 1000);
       }
 
-      // ---------- COLLECT ----------
+      // ================= COLLECT =================
       function collectMCQ() {
         const data = {};
         document.querySelectorAll("[data-mcq]:checked").forEach(el => {
@@ -264,13 +226,16 @@
       }
 
       function collectEssays() {
-        return Array.from(document.querySelectorAll("[data-essay]")).map(el => el.value);
+        return Array.from(document.querySelectorAll("[data-essay]"))
+          .map(el => el.value);
       }
 
-      // ---------- RESTORE ----------
+      // ================= RESTORE =================
       function restoreMCQ(data) {
         Object.entries(data).forEach(([name, value]) => {
-          const el = document.querySelector(`[name="${name}"][value="${value}"]`);
+          const el = document.querySelector(
+            `[name="${name}"][value="${value}"]`
+          );
           if (el) el.checked = true;
         });
       }
@@ -288,11 +253,11 @@
         });
       }
 
-      // ---------- AUTO SAVE ----------
+      // ================= AUTO SAVE =================
       document.addEventListener("input", saveState);
       document.addEventListener("change", saveState);
 
-      // ---------- INIT ----------
+      // ================= AUTO RESUME =================
       window.addEventListener("load", () => {
         const saved = loadState();
 
@@ -301,5 +266,6 @@
         }
       });
     </script>
+
   </body>
 </html>
