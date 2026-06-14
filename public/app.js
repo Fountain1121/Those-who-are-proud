@@ -303,7 +303,6 @@ const exam = {
 let startedAt = null;
 let timerHandle = null;
 const DRAFT_KEY = "pastoralSchoolThoseWhoAreProudDraft.v2";
-let isRestoringDraft = false;
 let isSubmitted = false;
 
 // ─── DOM refs ─────────────────────────────────────────────────────────────────
@@ -327,88 +326,83 @@ function formatTime(totalSeconds) {
   const h = Math.floor(totalSeconds / 3600);
   const m = Math.floor((totalSeconds % 3600) / 60);
   const s = totalSeconds % 60;
-  return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
+  return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
 }
 
-// ─── Render ───────────────────────────────────────────────────────────────────
+// ─── Render Functions ───────────────────────────────────────────────────────
 function renderMcq() {
-  mcqList.innerHTML = exam.mcq
-    .map(
-      (q, i) => `
-      <fieldset class="question-card">
-        <legend>${i + 1}. ${q.text}</legend>
-        ${q.options.map((opt, oi) => `
-          <label class="option">
-            <input type="radio" name="${q.id}" value="${optionLetter(oi)}" />
-            <span>${optionLetter(oi)}. ${opt}</span>
-          </label>`).join("")}
-      </fieldset>`
-    )
-    .join("");
+  mcqList.innerHTML = exam.mcq.map((q, i) => `
+    <fieldset class="question-card">
+      <legend>${i + 1}. ${q.text}</legend>
+      ${q.options.map((opt, oi) => `
+        <label class="option">
+          <input type="radio" name="${q.id}" value="${optionLetter(oi)}" />
+          <span>${optionLetter(oi)}. ${opt}</span>
+        </label>
+      `).join("")}
+    </fieldset>
+  `).join("");
 }
 
 function renderBlanks() {
-  blankList.innerHTML = exam.blanks
-    .map(
-      (q, i) => `
-      <div class="question-card">
-        <p class="question-title">${i + 1}. ${q.text}</p>
-        <div class="blank-inputs">
-          ${Array.from({ length: q.blanks }, (_, bi) => {
-            const label = q.blanks === 1 ? "Answer" : `Blank ${bi + 1}`;
-            return `<label>${label}<input name="${q.id}_${bi + 1}" /></label>`;
-          }).join("")}
-        </div>
-      </div>`
-    )
-    .join("");
+  blankList.innerHTML = exam.blanks.map((q, i) => `
+    <div class="question-card">
+      <p class="question-title">${i + 1}. ${q.text}</p>
+      <div class="blank-inputs">
+        ${Array.from({ length: q.blanks }, (_, bi) => {
+          const label = q.blanks === 1 ? "Answer" : `Blank ${bi + 1}`;
+          return `<label>${label}<input name="${q.id}_${bi + 1}" /></label>`;
+        }).join("")}
+      </div>
+    </div>
+  `).join("");
 }
 
 function renderEssays() {
-  essayList.innerHTML = exam.essays
-    .map(
-      (q, i) => `
-      <div class="question-card">
-        <label class="essay-toggle">
-          <input type="checkbox" class="essay-select" value="${q.id}" />
-          <span>Answer Question ${i + 1}: ${q.title}</span>
-        </label>
-        <p>${q.prompt.replace(/\n/g, "<br />")}</p>
-        <textarea name="${q.id}" disabled placeholder="Select this essay question to enable the text area."></textarea>
-      </div>`
-    )
-    .join("");
+  essayList.innerHTML = exam.essays.map((q, i) => `
+    <div class="question-card">
+      <label class="essay-toggle">
+        <input type="checkbox" class="essay-select" value="${q.id}" />
+        <span>Answer Question ${i + 1}: ${q.title}</span>
+      </label>
+      <p>${q.prompt.replace(/\n/g, "<br />")}</p>
+      <textarea name="${q.id}" disabled placeholder="Select this essay question to enable writing..."></textarea>
+    </div>
+  `).join("");
 }
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
 function setActiveSection(id, shouldSave = true) {
-  document.querySelectorAll(".section").forEach((s) => s.classList.toggle("active", s.id === id));
-  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.target === id));
+  document.querySelectorAll(".section").forEach(s => s.classList.toggle("active", s.id === id));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.target === id));
   if (id === "review") updateSummary();
   if (shouldSave) saveDraft();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// Next / Prev buttons
-document.addEventListener("click", (e) => {
-  const nextBtn = e.target.closest(".next-section-btn");
-  const prevBtn = e.target.closest(".prev-section-btn");
-  if (nextBtn) setActiveSection(nextBtn.dataset.next);
-  if (prevBtn) setActiveSection(prevBtn.dataset.prev);
-});
-
-document.querySelectorAll(".tab").forEach((tab) => {
+document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => setActiveSection(tab.dataset.target));
 });
 
-// ─── Essay controls ───────────────────────────────────────────────────────────
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".next-section-btn")) {
+    const next = e.target.closest(".next-section-btn").dataset.next;
+    setActiveSection(next);
+  }
+  if (e.target.closest(".prev-section-btn")) {
+    const prev = e.target.closest(".prev-section-btn").dataset.prev;
+    setActiveSection(prev);
+  }
+});
+
+// ─── Essay Controls ───────────────────────────────────────────────────────────
 function getSelectedEssays() {
-  return [...document.querySelectorAll(".essay-select:checked")].map((cb) => cb.value);
+  return [...document.querySelectorAll(".essay-select:checked")].map(cb => cb.value);
 }
 
 function updateEssayControls() {
   const selected = getSelectedEssays();
-  document.querySelectorAll(".essay-select").forEach((cb) => {
+  document.querySelectorAll(".essay-select").forEach(cb => {
     const ta = document.querySelector(`textarea[name="${cb.value}"]`);
     ta.disabled = !cb.checked;
     if (!cb.checked) ta.value = "";
@@ -421,18 +415,23 @@ function updateEssayControls() {
 function collectPayload() {
   const data = new FormData(form);
   const answers = {};
-  exam.mcq.forEach((q) => { answers[q.id] = data.get(q.id) || ""; });
+  exam.mcq.forEach(q => { answers[q.id] = data.get(q.id) || ""; });
 
   const fillBlanks = {};
-  exam.blanks.forEach((q) => {
+  exam.blanks.forEach(q => {
     fillBlanks[q.id] = Array.from({ length: q.blanks }, (_, i) =>
       String(data.get(`${q.id}_${i + 1}`) || "").trim()
     );
   });
 
-  const essays = getSelectedEssays().map((id) => {
-    const q = exam.essays.find((item) => item.id === id);
-    return { id, title: q.title, prompt: q.prompt, answer: String(data.get(id) || "").trim() };
+  const essays = getSelectedEssays().map(id => {
+    const q = exam.essays.find(item => item.id === id);
+    return {
+      id,
+      title: q.title,
+      prompt: q.prompt,
+      answer: String(data.get(id) || "").trim()
+    };
   });
 
   return {
@@ -447,21 +446,18 @@ function collectPayload() {
   };
 }
 
-// ─── Draft persistence ────────────────────────────────────────────────────────
-function getActiveSectionId() {
-  return document.querySelector(".section.active")?.id || "sectionA";
-}
-
+// ─── Draft Persistence ────────────────────────────────────────────────────────
 function saveDraft() {
-  if (isRestoringDraft || isSubmitted) return;
+  if (isSubmitted) return;
   const payload = collectPayload();
   const hasStarted = Boolean(payload.student.indexNumber || loginIndexNum.value.trim());
   if (!hasStarted) return;
+
   localStorage.setItem(DRAFT_KEY, JSON.stringify({
     ...payload,
     loginIndexNumber: loginIndexNum.value.trim(),
     startedAt,
-    activeSection: getActiveSectionId(),
+    activeSection: document.querySelector(".section.active")?.id || "sectionA",
     savedAt: new Date().toISOString()
   }));
 }
@@ -472,19 +468,19 @@ function restoreDraft() {
   let draft;
   try { draft = JSON.parse(raw); } catch { localStorage.removeItem(DRAFT_KEY); return false; }
 
-  // If already submitted (server-side) we rely on server check at login; just restore form state
-  isRestoringDraft = true;
-
+  isSubmitted = false;
   const studentId = draft.student?.indexNumber || draft.loginIndexNumber || "";
   loginIndexNum.value = studentId;
   form.elements.indexNumber.value = studentId;
-  form.elements.date.value = draft.student?.date || form.elements.date.value;
+  form.elements.date.value = draft.student?.date || form.elements.date.valueAsDate;
 
+  // Restore MCQ
   Object.entries(draft.answers || {}).forEach(([qId, val]) => {
     const radio = form.querySelector(`input[name="${qId}"][value="${val}"]`);
     if (radio) radio.checked = true;
   });
 
+  // Restore Blanks
   Object.entries(draft.fillBlanks || {}).forEach(([qId, vals]) => {
     vals.forEach((v, i) => {
       const input = form.elements[`${qId}_${i + 1}`];
@@ -492,27 +488,20 @@ function restoreDraft() {
     });
   });
 
-  (draft.essays || []).forEach((essay) => {
+  // Restore Essays
+  (draft.essays || []).forEach(essay => {
     const cb = form.querySelector(`.essay-select[value="${essay.id}"]`);
     const ta = form.elements[essay.id];
     if (cb) cb.checked = true;
     if (ta) ta.value = essay.answer || "";
   });
 
-  // *** Key requirement: restore startedAt so timer doesn't reset ***
   startedAt = Number(draft.startedAt) || null;
-
-  if (studentId) {
-    loginView.hidden = true;
-    examView.hidden = false;
-    if (!startedAt) startedAt = Date.now();
-    startTimer();
-  }
 
   updateEssayControls();
   setActiveSection(draft.activeSection || "sectionA", false);
   updateSummary();
-  isRestoringDraft = false;
+
   return true;
 }
 
@@ -528,8 +517,9 @@ function tickTimer() {
   const elapsed = Math.floor((Date.now() - startedAt) / 1000);
   const remaining = Math.max(0, exam.durationSeconds - elapsed);
   document.querySelector("#timer").textContent = formatTime(remaining);
-  if (remaining === 0) {
-    statusMessage.textContent = "Time is up. Please submit your exam now.";
+
+  if (remaining <= 0) {
+    statusMessage.textContent = "Time is up! Please submit your exam now.";
     statusMessage.classList.add("error");
     clearInterval(timerHandle);
   }
@@ -538,21 +528,16 @@ function tickTimer() {
 // ─── Summary ──────────────────────────────────────────────────────────────────
 function updateSummary() {
   const payload = collectPayload();
-  const mcqAnswered   = Object.values(payload.answers).filter(Boolean).length;
+  const mcqAnswered = Object.values(payload.answers).filter(Boolean).length;
   const blankAnswered = Object.values(payload.fillBlanks).flat().filter(Boolean).length;
-  const essayCount    = payload.essays.length;
-  const essayWords    = payload.essays.reduce(
-    (sum, e) => sum + e.answer.split(/\s+/).filter(Boolean).length, 0
-  );
-  const progress = Math.round(((mcqAnswered + blankAnswered + Math.min(essayCount, 4) * 5) / 60) * 100);
-  const rail = document.querySelector(".rail-progress span");
-  if (rail) rail.style.width = `${Math.max(4, progress)}%`;
+  const essayCount = payload.essays.length;
+  const essayWords = payload.essays.reduce((sum, e) => sum + e.answer.split(/\s+/).filter(Boolean).length, 0);
 
   document.querySelector("#progressSummary").innerHTML = `
-    <div class="summary-item"><span>Section A</span><strong>${mcqAnswered}/20</strong><small>multiple choice answered</small></div>
-    <div class="summary-item"><span>Section B</span><strong>${blankAnswered}/20</strong><small>blanks completed</small></div>
-    <div class="summary-item"><span>Section C</span><strong>${essayCount}/4</strong><small>essay questions selected</small></div>
-    <div class="summary-item"><span>Essay Writing</span><strong>${essayWords}</strong><small>words entered</small></div>
+    <div class="summary-item"><span>Section A</span><strong>${mcqAnswered}/20</strong><small>answered</small></div>
+    <div class="summary-item"><span>Section B</span><strong>${blankAnswered}/20</strong><small>completed</small></div>
+    <div class="summary-item"><span>Section C</span><strong>${essayCount}/4</strong><small>selected</small></div>
+    <div class="summary-item"><span>Essay Words</span><strong>${essayWords}</strong><small>written</small></div>
   `;
 }
 
@@ -560,47 +545,57 @@ function updateSummary() {
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const studentId = loginIndexNum.value.trim();
-  if (!studentId) { loginIndexNum.focus(); return; }
+  if (!studentId) {
+    loginIndexNum.focus();
+    return;
+  }
 
-  const btn = loginForm.querySelector("button[type='submit']");
+  const btn = loginForm.querySelector("button");
   btn.disabled = true;
   btn.textContent = "Checking...";
 
   try {
-    // Check if student already submitted (server-side lock)
     const res = await fetch(`/api/check-submitted?indexNumber=${encodeURIComponent(studentId)}`);
     const data = await res.json();
+
     if (data.submitted) {
       loginView.hidden = true;
       submittedView.hidden = false;
-      document.querySelector("#submittedConfirmId").textContent =
-        `Confirmation ID: ${data.confirmationId || "N/A"}`;
+      document.querySelector("#submittedConfirmId").textContent = `Confirmation ID: ${data.confirmationId || "N/A"}`;
       return;
     }
-  } catch {
-    // If check fails (offline/network) we allow entry; server will reject on final submit
+  } catch (e) {
+    console.warn("Could not check submission status (offline)");
   }
 
+  // Proceed to exam
   form.elements.indexNumber.value = studentId;
   loginView.hidden = true;
   examView.hidden = false;
+
   if (!startedAt) startedAt = Date.now();
   startTimer();
   saveDraft();
+
   btn.disabled = false;
   btn.textContent = "Continue to Exam";
 });
 
-// ─── Form events ──────────────────────────────────────────────────────────────
+// ─── Form Events ──────────────────────────────────────────────────────────────
 form.addEventListener("change", (e) => {
   if (e.target.classList.contains("essay-select")) updateEssayControls();
   updateSummary();
   saveDraft();
 });
-form.addEventListener("input", () => { updateSummary(); saveDraft(); });
+
+form.addEventListener("input", () => {
+  updateSummary();
+  saveDraft();
+});
+
 window.addEventListener("beforeunload", saveDraft);
 
-// ─── Submit ───────────────────────────────────────────────────────────────────
+// ─── Submit Exam ──────────────────────────────────────────────────────────────
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   statusMessage.textContent = "";
@@ -608,14 +603,13 @@ form.addEventListener("submit", async (event) => {
 
   const payload = collectPayload();
 
-  // Essay validation only — blanks and MCQ are now allowed to be empty
   if (payload.essays.length !== 4) {
-    statusMessage.textContent = "Please select exactly four essay questions in Section C.";
+    statusMessage.textContent = "Please select and answer exactly four essay questions.";
     statusMessage.classList.add("error");
     return;
   }
-  if (payload.essays.some((e) => !e.answer)) {
-    statusMessage.textContent = "Please write an answer for each selected essay question.";
+  if (payload.essays.some(e => !e.answer.trim())) {
+    statusMessage.textContent = "Please complete all four selected essays.";
     statusMessage.classList.add("error");
     return;
   }
@@ -630,19 +624,19 @@ form.addEventListener("submit", async (event) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "Submission failed.");
 
-    // Clean up
+    const result = await response.json();
+
+    if (!response.ok) throw new Error(result.error || "Submission failed");
+
+    // Success
     isSubmitted = true;
     clearInterval(timerHandle);
     localStorage.removeItem(DRAFT_KEY);
 
-    // Show submitted screen
     examView.hidden = true;
     submittedView.hidden = false;
-    document.querySelector("#submittedConfirmId").textContent =
-      `Confirmation ID: ${result.id}`;
+    document.querySelector("#submittedConfirmId").textContent = `Confirmation ID: ${result.id}`;
 
   } catch (error) {
     statusMessage.textContent = error.message;
@@ -660,6 +654,7 @@ updateEssayControls();
 updateSummary();
 document.querySelector("#timer").textContent = formatTime(exam.durationSeconds);
 
+// Restore draft if exists
 if (!restoreDraft()) {
-  // fresh load — nothing to restore
+  // Fresh load
 }
