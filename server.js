@@ -31,6 +31,21 @@ function isAdmin(req) {
   return ADMIN_PIN !== "change-me" && pin === ADMIN_PIN;
 }
 
+app.post("/api/admin/login", (req, res) => {
+  const { username, password } = req.body;
+
+  const ADMIN_USER = "admin";
+  const ADMIN_PASS = "admin123";
+
+  if (username === ADMIN_USER && password === ADMIN_PASS) {
+    // simple fake token
+    const token = "admin-token-123";
+    return res.json({ success: true, token });
+  }
+
+  return res.status(401).json({ error: "Invalid credentials" });
+});
+
 app.post("/api/submissions", (req, res) => {
   const body = req.body || {};
   const requiredStudentFields = ["indexNumber"];
