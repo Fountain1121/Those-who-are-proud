@@ -44,6 +44,22 @@ app.get("/api/admin/verify", (req, res) => {
   res.status(401).json({ error: "Invalid token" });
 });
 
+// ====================== CHECK SUBMITTED ======================
+app.get("/api/check-submitted", (req, res) => {
+  const { indexNumber } = req.query;
+  if (!indexNumber) return res.status(400).json({ error: "Missing indexNumber" });
+
+  const submissions = readSubmissions();
+  const existing = submissions.find(s => 
+    s.student.indexNumber.toLowerCase() === indexNumber.toLowerCase()
+  );
+
+  res.json({ 
+    submitted: !!existing, 
+    confirmationId: existing ? existing.id : null 
+  });
+});
+
 // ====================== STUDENT SUBMISSION ======================
 app.post("/api/submissions", (req, res) => {
   const body = req.body || {};
