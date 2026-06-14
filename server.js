@@ -9,13 +9,28 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_TOKEN = "admin-token-123";
 
 const SUBMISSIONS_FILE = path.join(__dirname, "data", "submissions.jsonl");
+const ALLOWED_IDS_FILE = path.join(__dirname, "data", "allowed-students.txt");
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 function ensureStorage() {
-  fs.mkdirSync(path.dirname(SUBMISSIONS_FILE), { recursive: true });
+  fs.mkdirSync(path.join(__dirname, "data"), { recursive: true });
   if (!fs.existsSync(SUBMISSIONS_FILE)) fs.writeFileSync(SUBMISSIONS_FILE, "");
+  if (!fs.existsSync(ALLOWED_IDS_FILE)) {
+    fs.writeFileSync(ALLOWED_IDS_FILE, "PS-2025-001\nPS-2025-002\n");
+  }
+}
+
+function getAllowedStudentIds() {
+  try {
+    return fs.readFileSync(ALLOWED_IDS_FILE, "utf8")
+      .split(/\r?\n/)
+      .map(line => line.trim().toUpperCase())
+      .filter(Boolean);
+  } catch (e) {
+    return [];
+  }
 }
 
 function readSubmissions() {
@@ -44,69 +59,67 @@ app.get("/api/admin/verify", (req, res) => {
   res.status(401).json({ error: "Invalid token" });
 });
 
-// ====================== SUBMISSIONS ======================
-app.post("/api/submissions", (req, res) => { /* same as before */ });
+// ====================== CHECK + SUBMIT ======================
+app.get("/api/check-submitted", (req, res) => {
+  const { indexNumber } = req.query;
+  if (!indexNumber) return res.status(400).json({ error: "Missing indexNumber" });
 
-app.get("/api/submissions", (req, res) => {
-  if (!isAdmin(req)) return res.status(401).json({ error: "Unauthorized" });
-  res.json(readSubmissions());
-});
-
-// ====================== DOWNLOADS ======================
-app.get("/api/submissions/:id/txt", (req, res) => {
-  if (!isAdmin(req)) return res.status(401).send("Unauthorized");
-
-  const { id } = req.params;
-  const submissions = readSubmissions();
-  const sub = submissions.find(s => s.id === id);
-  if (!sub) return res.status(404).send("Not found");
-
-  let txt = `PASTORAL SCHOOL EXAM SUBMISSION\n`;
-  txt += `ID: ${sub.id}\n`;
-  txt += `Student ID: ${sub.student.indexNumber}\n`;
-  txt += `Submitted: ${new Date(sub.submittedAt).toLocaleString()}\n`;
-  txt += `Time Taken: ${sub.elapsedSeconds ? Math.floor(sub.elapsedSeconds/60) + " minutes" : "N/A"}\n\n`;
-
-  txt += "=== SECTION A - MULTIPLE CHOICE ===\n";
-  txt += Object.entries(sub.answers || {}).map(([q, a]) => `${q}: ${a || "Not answered"}`).join("\n") + "\n\n";
-
-  txt += "=== SECTION B - FILL IN THE BLANKS ===\n";
-  txt += Object.entries(sub.fillBlanks || {}).map(([q, vals]) => 
-    `${q}: ${vals.map(v => v || "—").join(" | ")}`
-  ).join("\n") + "\n\n";
-
-  txt += "=== SECTION C - ESSAYS ===\n";
-  (sub.essays || []).forEach((essay, i) => {
-    txt += `\nEssay ${i+1}: ${essay.title}\n`;
-    txt += essay.answer + "\n\n";
-  });
-
-  res.setHeader("Content-Type", "text/plain");
-  res.setHeader("Content-Disposition", `attachment; filename="submission-${sub.student.indexNumber}.txt"`);
-  res.send(txt);
-});
-
-app.get("/api/submissions/all.zip", (req, res) => {
-  if (!isAdmin(req)) return res.status(401).send("Unauthorized");
+  const allowed = getAllowedStudentIds();
+  if (!allowed.includes(indexNumber.toUpperCase())) {
+    return res.status(403).json({ error: "Invalid or unauthorized Student ID" });
+  }
 
   const submissions = readSubmissions();
-  const zip = new AdmZip();
+  const existing = submissions.find(s => 
+    s.student.indexNumber.toUpperCase() === indexNumber.toUpperCase()
+  );
 
-  submissions.forEach(sub => {
-    let txt = `PASTORAL SCHOOL EXAM SUBMISSION\n`;
-    txt += `ID: ${sub.id}\nStudent: ${sub.student.indexNumber}\nSubmitted: ${sub.submittedAt}\n\n`;
-
-    txt += "=== SECTION A ===\n" + JSON.stringify(sub.answers, null, 2) + "\n\n";
-    txt += "=== SECTION B ===\n" + JSON.stringify(sub.fillBlanks, null, 2) + "\n\n";
-    txt += "=== SECTION C ===\n" + JSON.stringify(sub.essays, null, 2);
-
-    zip.addFile(`submission-${sub.student.indexNumber}.txt`, Buffer.from(txt, "utf8"));
+  res.json({ 
+    submitted: !!existing, 
+    confirmationId: existing ? existing.id : null 
   });
-
-  res.setHeader("Content-Type", "application/zip");
-  res.setHeader("Content-Disposition", 'attachment; filename="all-exam-submissions.zip"');
-  res.send(zip.toBuffer());
 });
+
+app.post("/api/submissions", (req, res) => {
+  const body = req.body || {};
+  let indexNumber = String(body.student?.indexNumber || "").trim().toUpperCase();
+
+  if (!indexNumber) return res.status(400).json({ error: "Missing student indexNumber" });
+
+  const allowed = getAllowedStudentIds();
+  if (!allowed.includes(indexNumber)) {
+    return res.status(403).json({ error: "This Student ID is not authorized to take the exam." });
+  }
+
+  if (!Array.isArray(body.essays) || body.essays.length !== 4) {
+    return res.status(400).json({ error: "Exactly four essay answers required." });
+  }
+
+  const submissions = readSubmissions();
+  if (submissions.some(s => s.student.indexNumber.toUpperCase() === indexNumber)) {
+    return res.status(409).json({ error: "You have already submitted this exam." });
+  }
+
+  const record = {
+    id: crypto.randomUUID(),
+    submittedAt: new Date().toISOString(),
+    student: {
+      indexNumber,
+      date: String(body.student.date || "").trim()
+    },
+    answers: body.answers || {},
+    fillBlanks: body.fillBlanks || {},
+    essays: body.essays,
+    elapsedSeconds: Number(body.elapsedSeconds || 0)
+  };
+
+  ensureStorage();
+  fs.appendFileSync(SUBMISSIONS_FILE, JSON.stringify(record) + "\n");
+
+  res.status(201).json({ id: record.id });
+});
+
+// Keep your existing admin download routes (TXT + ZIP) from previous version
 
 app.listen(PORT, () => {
   ensureStorage();
