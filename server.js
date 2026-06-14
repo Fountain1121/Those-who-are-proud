@@ -33,7 +33,7 @@ function isAdmin(req) {
 
 app.post("/api/submissions", (req, res) => {
   const body = req.body || {};
-  const requiredStudentFields = ["indexNumber", "fullName"];
+  const requiredStudentFields = ["indexNumber"];
   const missing = requiredStudentFields.filter((field) => !String(body.student?.[field] || "").trim());
 
   if (missing.length) {
@@ -48,7 +48,6 @@ app.post("/api/submissions", (req, res) => {
     id: crypto.randomUUID(),
     submittedAt: new Date().toISOString(),
     student: {
-      fullName: String(body.student.fullName).trim(),
       indexNumber: String(body.student.indexNumber).trim(),
       date: String(body.student.date || "").trim()
     },
@@ -71,7 +70,7 @@ app.get("/api/submissions", (req, res) => {
 app.get("/api/submissions.csv", (req, res) => {
   if (!isAdmin(req)) return res.status(401).send("Invalid admin PIN.");
   const rows = readSubmissions();
-  const headers = ["id", "submittedAt", "fullName", "indexNumber", "date", "elapsedSeconds"];
+  const headers = ["id", "submittedAt", "indexNumber", "date", "elapsedSeconds"];
   const escape = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
   const csv = [
     headers.join(","),
@@ -79,7 +78,6 @@ app.get("/api/submissions.csv", (req, res) => {
       [
         row.id,
         row.submittedAt,
-        row.student.fullName,
         row.student.indexNumber,
         row.student.date,
         row.elapsedSeconds
